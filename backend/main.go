@@ -1,18 +1,27 @@
 package main
 
 import (
-  "net/http"
-  "fmt"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
-  fs := http.FileServer(http.Dir("../frontend/dist"))
-  http.Handle("/", fs)
-  http.HandleFunc("/api/hello", func(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
-    w.Write([]byte(`{"message":"pimpin kontol"}`))
-  })
+	app := fiber.New()
 
-  fmt.Println("Listening at http://localhost:8080")
-  http.ListenAndServe(":8080", nil)
+	// Middleware
+	app.Use(logger.New())
+	app.Use(cors.New())
+
+	// API
+	app.Get("/api/hello", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"message": "Halo dari Fiber!",
+		})
+	})
+
+	// Serve Vue build (production mode)
+	app.Static("/", "../frontend/dist")
+
+	app.Listen(":8080")
 }

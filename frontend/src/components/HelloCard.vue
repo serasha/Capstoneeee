@@ -1,19 +1,17 @@
 <template>
   <div class="card">
-    <h1>{{ title }}</h1>
+    <h1>Vue + Fiber</h1>
     <p>{{ message }}</p>
-    <button @click="fetchHello">Ambil Data dari Backend</button>
+    <button @click="fetchData">Fetch from Go API</button>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+const message = ref("Klik tombol untuk ambil data")
 
-const title = '🎉 Vue + Go berjalan!'
-const message = ref('Klik tombol untuk ambil pesan dari Go API.')
-
-async function fetchHello() {
-  const res = await fetch('/api/hello')
+const fetchData = async () => {
+  const res = await fetch("/api/hello")
   const data = await res.json()
   message.value = data.message
 }
@@ -21,23 +19,22 @@ async function fetchHello() {
 
 <style scoped>
 .card {
-  max-width: 600px;
-  margin: 2rem auto;
+  margin: 3rem auto;
   padding: 2rem;
-  border-radius: 12px;
+  max-width: 600px;
+  text-align: center;
   background: #42b883;
   color: white;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 button {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
   background: #35495e;
+  border: none;
   color: white;
+  border-radius: 8px;
   cursor: pointer;
 }
 button:hover {
