@@ -1,8 +1,13 @@
 {
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@vitejs/plugin-vue": "^5.2.4",
+    "concurrently": "^9.1.2",
+    "vite-plugin-vue-devtools": "^7.7.6"
   },
   "scripts": {
     "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && go run main.go\""
+  },
+  "dependencies": {
+    "vite": "^6.3.5"
   }
 }
