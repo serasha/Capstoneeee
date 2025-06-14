@@ -1,11 +1,11 @@
 <template>
-  <Layouts />
-  <!-- <HelloCard /> -->
-   
-   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <UserLayout>
+    <router-view />
+  </UserLayout>
 </template>
 
 <script setup>
-import Layouts from './Layouts/UserLayout.vue'
-import HelloCard from './components/HelloCard.vue'
+import UserLayout from '@/Layouts/UserLayout.vue'
 </script>
+
+

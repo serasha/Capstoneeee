@@ -8,6 +8,8 @@
     "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && go run main.go\""
   },
   "dependencies": {
+    "bootstrap": "^5.3.6",
+    "bootstrap-icons": "^1.13.1",
     "vite": "^6.3.5"
   }
 }
