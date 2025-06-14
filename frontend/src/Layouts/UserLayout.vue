@@ -4,12 +4,29 @@ import Footer from '@/components/Footer.vue'
 </script>
 
 <template>
-  <div style="min-height: 100vh; display: flex; flex-direction: column;">
+  <div class="layout-container">
     <Navbar />
-    <div style="flex: 1 0 auto;">
-      <!-- Tempatkan konten halaman di sini -->
+    <main class="content-wrapper">
       <slot />
-    </div>
+    </main>
     <Footer />
   </div>
 </template>
+
+<style scoped>
+.layout-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.content-wrapper {
+  flex: 1 0 auto;
+  width: 100%;
+  min-height: calc(100vh - 60px); /* 60px adalah tinggi navbar */
+  padding-top: 60px; /* Kompensasi untuk fixed navbar */
+}
+</style>

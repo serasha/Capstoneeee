@@ -1,8 +1,8 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-dark w-100 py-2" style="background-color: #222; position: fixed; top: 0; left: 0; right: 0; z-index: 1030;">
+  <nav class="navbar navbar-expand-lg navbar-dark w-100 py-2 main-navbar">
     <div class="container-fluid px-4 d-flex justify-content-between align-items-center w-100">
       <!-- Brand/Logo -->
-      <a class="navbar-brand fw-bold ms-3" href="#" style="color: #ff4d4d; font-size: 1.5rem; font-style: italic; border: none;">
+      <a class="navbar-brand fw-bold ms-3" href="#">
         SPBE
       </a>
 
@@ -29,18 +29,10 @@
 
       <!-- Right side buttons -->
       <div class="d-flex gap-2 mb-0 me-4 daftar-masuk-group">
-        <a 
-          href="/daftar" 
-          class="btn btn-outline-warning daftar-btn"
-          style="border-color: #ffca28; color: #ffca28; font-weight: 500;"
-        >
+        <a href="/daftar" class="btn btn-outline-warning daftar-btn">
           Daftar
         </a>
-        <a 
-          href="/masuk" 
-          class="btn btn-warning masuk-btn"
-          style="background-color: #ffca28; border-color: #ffca28; color: #000; font-weight: 500;"
-        >
+        <a href="/masuk" class="btn btn-warning masuk-btn">
           Masuk
         </a>
       </div>
@@ -64,13 +56,19 @@ export default {
 
 <style scoped>
 /* Navbar positioning */
-.navbar {
+.main-navbar {
+  background-color: #222;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   width: 100vw !important;
   height: 60px !important;
   padding-top: 8px !important;
   padding-bottom: 8px !important;
-  border-radius: 0; /* Menghapus corner radius */
+  border-radius: 0;
 }
 
 /* Ensure full width */
@@ -90,6 +88,9 @@ body {
 .navbar-brand {
   font-weight: bold !important;
   border: none !important;
+  color: #ff4d4d;
+  font-size: 1.5rem;
+  font-style: italic;
 }
 
 .nav-link {
@@ -182,9 +183,13 @@ body {
   background: transparent !important;
   color: #ffca28 !important;
 }
+
 .masuk-btn {
   border-radius: 4px !important;
   font-size: 16px !important;
+  background-color: #ffca28;
+  border-color: #ffca28;
+  color: #000;
 }
 
 .daftar-masuk-group > .daftar-btn {

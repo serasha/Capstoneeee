@@ -1,86 +1,88 @@
 <template>
   <footer class="footer bg-dark text-white">
-    <div class="container py-5">
-      <!-- Main Footer Content -->
-      <div class="row gy-4">
-        <!-- Logo and Description Column -->
-        <div class="col-lg-4 col-md-12">
-          <div class="text-center text-lg-start">
-            <h2 class="logo mb-3">{{ footerData.title }}</h2>
-            <p class="description text-muted">
-              {{ footerData.description }}
-            </p>
-            <!-- Social Media Icons -->
-            <div class="social-icons mt-3">
-              <a 
-                v-for="social in footerData.socialMedia" 
-                :key="social.name"
-                :href="social.url" 
-                class="social-link me-3"
-                :title="social.name"
-              >
-                <i :class="social.icon"></i>
-              </a>
+      <div class="footer-wrapper">
+      <div class="container py-5">
+        <!-- Main Footer Content -->
+        <div class="row gy-4">
+          <!-- Logo and Description Column -->
+          <div class="col-lg-4 col-md-12">
+            <div class="text-center text-lg-start">
+              <h2 class="logo mb-3">{{ footerData.title }}</h2>
+              <p class="description text-muted">
+                {{ footerData.description }}
+              </p>
+              <!-- Social Media Icons -->
+              <div class="social-icons mt-3">
+                <a 
+                  v-for="social in footerData.socialMedia" 
+                  :key="social.name"
+                  :href="social.url" 
+                  class="social-link me-3"
+                  :title="social.name"
+                >
+                  <i :class="social.icon"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Learn Section -->
+          <div class="col-lg-4 col-md-6">
+            <div class="text-center text-lg-start">
+              <h5 class="section-title mb-3">{{ footerData.learnSection.title }}</h5>
+              <ul class="list-unstyled footer-links">
+                <li v-for="link in footerData.learnSection.links" :key="link.id" class="mb-2">
+                  <a 
+                    href="#" 
+                    class="footer-link text-decoration-none"
+                    @click.prevent="handleLinkClick(link)"
+                  >
+                    {{ link.text }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Services Section -->
+          <div class="col-lg-4 col-md-6">
+            <div class="text-center text-lg-start">
+              <h5 class="section-title mb-3">{{ footerData.servicesSection.title }}</h5>
+              <ul class="list-unstyled footer-links">
+                <li v-for="service in footerData.servicesSection.services" :key="service.id" class="mb-2">
+                  <a 
+                    href="#" 
+                    class="footer-link text-decoration-none d-flex align-items-center justify-content-center justify-content-lg-start"
+                    @click.prevent="handleServiceClick(service)"
+                  >
+                    <i :class="service.icon" class="me-2"></i>
+                    {{ service.text }}
+                  </a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <!-- Learn Section -->
-        <div class="col-lg-4 col-md-6">
-          <div class="text-center text-lg-start">
-            <h5 class="section-title mb-3">{{ footerData.learnSection.title }}</h5>
-            <ul class="list-unstyled footer-links">
-              <li v-for="link in footerData.learnSection.links" :key="link.id" class="mb-2">
-                <a 
-                  href="#" 
-                  class="footer-link text-decoration-none"
-                  @click.prevent="handleLinkClick(link)"
-                >
-                  {{ link.text }}
-                </a>
-              </li>
-            </ul>
+        <!-- Divider -->
+        <hr class="footer-divider my-4">
+
+        <!-- Copyright and Additional Info -->
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <p class="copyright mb-0 text-center text-md-start">
+              {{ footerData.copyright }}
+            </p>
           </div>
-        </div>
-
-        <!-- Services Section -->
-        <div class="col-lg-4 col-md-6">
-          <div class="text-center text-lg-start">
-            <h5 class="section-title mb-3">{{ footerData.servicesSection.title }}</h5>
-            <ul class="list-unstyled footer-links">
-              <li v-for="service in footerData.servicesSection.services" :key="service.id" class="mb-2">
-                <a 
-                  href="#" 
-                  class="footer-link text-decoration-none d-flex align-items-center justify-content-center justify-content-lg-start"
-                  @click.prevent="handleServiceClick(service)"
-                >
-                  <i :class="service.icon" class="me-2"></i>
-                  {{ service.text }}
+          <div class="col-md-4">
+            <div class="text-center text-md-end mt-2 mt-md-0">
+              <small class="text-muted">
+                Version {{ appVersion }} | 
+                <a href="#" class="text-muted text-decoration-none" @click.prevent="showInfo">
+                  Info Sistem
                 </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Divider -->
-      <hr class="footer-divider my-4">
-
-      <!-- Copyright and Additional Info -->
-      <div class="row align-items-center">
-        <div class="col-md-8">
-          <p class="copyright mb-0 text-center text-md-start">
-            {{ footerData.copyright }}
-          </p>
-        </div>
-        <div class="col-md-4">
-          <div class="text-center text-md-end mt-2 mt-md-0">
-            <small class="text-muted">
-              Version {{ appVersion }} | 
-              <a href="#" class="text-muted text-decoration-none" @click.prevent="showInfo">
-                Info Sistem
-              </a>
-            </small>
+              </small>
+            </div>
           </div>
         </div>
       </div>
@@ -201,12 +203,26 @@ export default {
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
   font-family: 'Poppins', sans-serif;
   position: relative;
-  overflow: hidden;
-  width: 100vw; /* Gunakan viewport width untuk lebar penuh */
-  margin-left: calc(-50vw + 50%); /* Trick untuk keluar dari container */
-  margin-top: auto;
-  padding: 0; /* Reset padding default */
+  width: 100%;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  min-height: 100%;
+}
+
+.footer-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem 15px;
+  flex: 1 0 auto;
 }
 
 .footer::before {
@@ -360,6 +376,10 @@ export default {
 
 /* Responsive adjustments */
 @media (max-width: 767.98px) {
+  .container {
+    padding: 1.5rem 15px;
+  }
+  
   .logo {
     font-size: 2rem;
   }
