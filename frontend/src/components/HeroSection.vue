@@ -1,9 +1,9 @@
 <template>
   <section class="hero-section text-white">
-    <div class="container-fluid py-5">
-      <div class="row align-items-center">
+    <div class="container-fluid hero-container">
+      <div class="row align-items-center h-100">
         <!-- Kiri: Teks -->
-        <div class="col-md-6 px-5">
+        <div class="col-md-6 px-5 py-4 hero-text">
           <h1 class="fw-bold mb-3">Modul Layanan Pendaftaran<br>dan Pendataan Transmigrasi</h1>
           <p>
             Layanan Transmigrasi dari Pemerintah Kota Yogyakarta kini hadir di genggaman Anda melalui 
@@ -12,20 +12,239 @@
           </p>
         </div>
 
-        <!-- Kanan: Gambar -->
+        <!-- Kanan: Lottie Animation -->
         <div class="col-md-6 text-center mt-4 mt-md-0">
-          <img src="/hero-ilustrasi.png" alt="Ilustrasi Transmigrasi" class="img-fluid" />
+          <div class="lottie-container">
+            <!-- Option 1: Menggunakan lottie-web langsung -->
+            <div ref="lottieContainer" class="lottie-animation"></div>
+            
+            <!-- Option 2: Jika menggunakan Vue Lottie component -->
+            <!-- <lottie-animation
+              ref="anim" 
+              :animation-data="animationData"
+              :auto-play="true"
+              :loop="true"
+              :speed="1"
+              class="lottie-animation"
+            /> -->
+          </div>
         </div>
       </div>
     </div>
   </section>
 </template>
 
+<script>
+import lottie from 'lottie-web'
+// Jika menggunakan Vue Lottie component, uncomment line berikut:
+// import LottieAnimation from 'lottie-vuejs/src/LottieAnimation.vue'
+
+export default {
+  name: 'HeroSection',
+  // components: {
+  //   LottieAnimation // Jika menggunakan Vue Lottie component
+  // },
+  data() {
+    return {
+      animationData: null,
+      lottieAnimation: null
+    }
+  },
+  mounted() {
+    this.loadLottieAnimation()
+  },
+  beforeUnmount() {
+    if (this.lottieAnimation) {
+      this.lottieAnimation.destroy()
+    }
+  },
+  methods: {
+    async loadLottieAnimation() {
+      try {
+        // Option 1: Load dari CDN LottieFiles (recommended)
+        const animationUrl = 'https://assets3.lottiefiles.com/packages/lf20_jcikwtux.json' // Contoh: Digital services animation
+        
+        // Option 2: Load dari file lokal
+        // const animationData = await import('@/assets/animations/hero-animation.json')
+        
+        this.lottieAnimation = lottie.loadAnimation({
+          container: this.$refs.lottieContainer,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: animationUrl // Untuk load dari URL
+          // animationData: animationData.default // Untuk load dari file lokal
+        })
+
+        // Event listeners untuk kontrol animasi
+        this.lottieAnimation.addEventListener('complete', () => {
+          console.log('Animation completed')
+        })
+
+      } catch (error) {
+        console.error('Error loading animation:', error)
+        // Fallback ke static illustration jika gagal load
+        this.showFallbackIllustration()
+      }
+    },
+
+    showFallbackIllustration() {
+      // Fallback SVG jika Lottie gagal load
+      this.$refs.lottieContainer.innerHTML = `
+        <svg viewBox="0 0 400 300" class="fallback-illustration">
+          <rect width="400" height="300" fill="#7CB342" rx="20"/>
+          <circle cx="150" cy="120" r="30" fill="#FFDBCB"/>
+          <rect x="130" y="150" width="40" height="60" fill="#3F51B5" rx="10"/>
+          <circle cx="250" cy="120" r="30" fill="#FFDBCB"/>
+          <rect x="230" y="150" width="40" height="60" fill="#E91E63" rx="10"/>
+          <text x="200" y="250" text-anchor="middle" fill="white" font-size="16">Digital Services</text>
+        </svg>
+      `
+    },
+
+    // Method untuk kontrol animasi
+    playAnimation() {
+      if (this.lottieAnimation) {
+        this.lottieAnimation.play()
+      }
+    },
+
+    pauseAnimation() {
+      if (this.lottieAnimation) {
+        this.lottieAnimation.pause()
+      }
+    },
+
+    stopAnimation() {
+      if (this.lottieAnimation) {
+        this.lottieAnimation.stop()
+      }
+    }
+  }
+}
+</script>
+
 <style scoped>
 .hero-section {
-  background: url('/pattern-bg.png'), #a30b2f; /* Ganti dengan path gambar motif */
+  background: linear-gradient(rgba(38, 37, 37, 0.2), rgba(38, 37, 37, 0.2)), url(hero-ilustrasi.png);
   background-size: cover;
   background-position: center;
-  color: white;
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
+    radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 50px 50px, 30px 30px;
+}
+
+.lottie-container {
+  position: relative;
+  max-width: 100%;
+  height: auto;
+}
+
+.lottie-animation {
+  width: 100%;
+  height: auto;
+  max-width: 650px;
+  max-height: 500px;
+  margin: 0 auto;
+  filter: drop-shadow(0 15px 40px rgba(0,0,0,0.25));
+}
+
+.fallback-illustration {
+  width: 100%;
+  height: auto;
+  max-width: 400px;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2));
+}
+
+h1 {
+  font-size: 2.8rem;
+  line-height: 1.2;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  opacity: 0.9;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 2rem;
+}
+
+.hero-container {
+  min-height: 100vh;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.hero-text {
+  padding-top: 8rem !important;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    min-height: 90vh;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .lottie-animation {
+    max-width: 400px;
+    max-height: 320px;
+  }
+  
+  .col-md-6.px-5 {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+}
+
+/* Loading state */
+.lottie-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 1;
+}
+
+.lottie-container.loaded::before {
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 </style>
