@@ -69,13 +69,13 @@
 
         <!-- Copyright and Additional Info -->
         <div class="row align-items-center">
-          <div class="col-md-8">
-            <p class="copyright mb-0 text-center text-md-start">
+          <div class="col-12">
+            <p class="copyright mb-0 text-center">
               {{ footerData.copyright }}
             </p>
           </div>
-          <div class="col-md-4">
-            <div class="text-center text-md-end mt-2 mt-md-0">
+          <div class="col-12 mt-2">
+            <div class="text-center">
               <small class="text-muted">
                 Version {{ appVersion }} | 
                 <a href="#" class="text-muted text-decoration-none" @click.prevent="showInfo">
@@ -95,7 +95,7 @@
       class="btn btn-primary position-fixed bottom-0 end-0 m-3 rounded-circle back-to-top"
       style="z-index: 1000;"
     >
-      <i class="fas fa-arrow-up"></i>
+      <i class="bi bi-arrow-up"></i>
     </button>
   </footer>
 </template>
@@ -111,11 +111,12 @@ export default {
         title: 'SPBE',
         description: 'Layanan Transmigrasi Pemkot Yogyakarta kini bisa diakses melalui SPBE. Daftar, cek info, dan pantau pengajuan lebih mudah langsung dari genggaman Anda.',
         socialMedia: [
-          { name: 'Facebook', icon: 'fab fa-facebook-f', url: '#' },
-          { name: 'Twitter', icon: 'fab fa-twitter', url: '#' },
-          { name: 'Instagram', icon: 'fab fa-instagram', url: '#' },
-          { name: 'YouTube', icon: 'fab fa-youtube', url: '#' }
+          { name: 'Facebook', icon: 'bi bi-facebook', url: '#' },
+          { name: 'Twitter', icon: 'bi bi-twitter-x', url: '#' },
+          { name: 'Instagram', icon: 'bi bi-instagram', url: '#' },
+          { name: 'YouTube', icon: 'bi bi-youtube', url: '#' }
         ],
+        
         learnSection: {
           title: 'Pelajari',
           links: [
@@ -128,10 +129,10 @@ export default {
         servicesSection: {
           title: 'Layanan',
           services: [
-            { id: 1, text: 'Pengajuan Formulir Transmigrasi', icon: 'fas fa-file-alt', action: 'form' },
-            { id: 2, text: 'Pantau Status Pengajuan', icon: 'fas fa-search', action: 'status' },
-            { id: 3, text: 'Bantuan & Konsultasi', icon: 'fas fa-headset', action: 'help' },
-            { id: 4, text: 'Download Dokumen', icon: 'fas fa-download', action: 'download' }
+            { id: 1, text: 'Pengajuan Formulir Transmigrasi', icon: 'bi bi-file-earmark-text', action: 'form' },
+            { id: 2, text: 'Pantau Status Pengajuan', icon: 'bi bi-search', action: 'status' },
+            { id: 3, text: 'Bantuan & Konsultasi', icon: 'bi bi-headset', action: 'help' },
+            { id: 4, text: 'Download Dokumen', icon: 'bi bi-download', action: 'download' }
           ]
         },
         copyright: 'Copyright ©2025, SPBE by Dinas Komunikasi Informatika Yogyakarta'
@@ -354,6 +355,7 @@ export default {
   color: #999999;
   font-size: 0.9rem;
   font-weight: 400;
+  text-align: center;
 }
 
 .back-to-top {
@@ -372,6 +374,10 @@ export default {
 .back-to-top:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.back-to-top i {
+  font-size: 1.3rem;
 }
 
 /* Responsive adjustments */
