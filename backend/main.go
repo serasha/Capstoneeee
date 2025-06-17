@@ -2,18 +2,31 @@ package main
 
 import (
 	"log"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"my-app/backend/models" // pastikan path ini sesuai module kamu
+	"my-app/backend/models"
+	"my-app/backend/handlers"
 )
 
 type App struct {
 	DB *gorm.DB
+}
+
+func setupRoutes(app *fiber.App, db *gorm.DB) {
+	app.Get("/api/masyarakat", handlers.GetAllMasyarakat(db))
+	app.Post("/api/masyarakat", handlers.CreateMasyarakat(db))
+
+	app.Get("/api/pendaftaran", handlers.GetAllPendaftaran(db))
+	app.Post("/api/pendaftaran", handlers.CreatePendaftaran(db))
+
+	app.Get("/api/admin", handlers.GetAllAdmin(db))
+	app.Post("/api/admin", handlers.CreateAdmin(db))
+
+	app.Get("/api/superadmin", handlers.GetAllSuperAdmin(db))
+	app.Post("/api/superadmin", handlers.CreateSuperAdmin(db))
 }
 
 func main() {
@@ -24,9 +37,15 @@ func main() {
 		log.Fatal("Gagal membuka koneksi ke database:", err)
 	}
 
-	// Migrasi tabel jika belum ada
-	if err := db.AutoMigrate(&models.User{}); err != nil {
-		log.Fatal("Gagal migrate tabel users:", err)
+	// Migrasi semua tabel
+	if err := db.AutoMigrate(
+		&models.User{},
+		&models.Masyarakat{},
+		&models.Pendaftaran{},
+		&models.Admin{},
+		&models.SuperAdmin{},
+	); err != nil {
+		log.Fatal("Gagal migrate semua tabel:", err)
 	}
 	log.Println("Berhasil terhubung dan migrate database!")
 
@@ -44,11 +63,13 @@ func main() {
 	})
 	app.Get("/api/users", appInstance.getUsers)
 
+	setupRoutes(app, db)
+
 	// Serve frontend
 	app.Static("/", "../frontend/dist")
 
 	// Start server
-	if err := app.Listen(":8070"); err != nil {
+	if err := app.Listen(":8888"); err != nil {
 		log.Fatal("Gagal menjalankan server:", err)
 	}
 }
@@ -63,3 +84,5 @@ func (a *App) getUsers(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{"data": users})
 }
+
+

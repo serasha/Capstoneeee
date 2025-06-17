@@ -1,0 +1,37 @@
+### CREATE MASYARAKAT
+POST http://localhost:8070/api/masyarakat
+Content-Type: application/json
+
+{
+  "NamaLengkap": "Budi Santoso",
+  "NIK": "1234567890123456",
+  "TanggalLahir": "1990-01-01T00:00:00Z",
+  "KK": "1234567890123456",
+  "Email": "budi@example.com",
+  "Alamat": "Jl. Merdeka No. 1",
+  "NomorTelepon": "08123456789",
+  "KtpSuami": "",
+  "KtpIstri": "",
+  "Ijazah": "",
+  "PasFoto": "",
+  "SuratNikah": "",
+  "SuratNikahFile": ""
+}
+
+### GET ALL MASYARAKAT
+GET http://localhost:8070/api/masyarakat
+
+### GET MASYARAKAT BY ID
+GET http://localhost:8070/api/masyarakat/1
+
+### UPDATE MASYARAKAT
+PUT http://localhost:8070/api/masyarakat/1
+Content-Type: application/json
+
+{
+  "NamaLengkap": "Budi Santoso Update",
+  "Alamat": "Jl. Sudirman No. 2"
+}
+
+### DELETE MASYARAKAT
+DELETE http://localhost:8070/api/masyarakat/1
