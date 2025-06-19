@@ -2,20 +2,14 @@ module my-app/backend
 
 go 1.24.4
 
-require (
-	github.com/go-sql-driver/mysql v1.9.2
-	github.com/gofiber/fiber/v2 v2.52.8
-)
+require github.com/gofiber/fiber/v2 v2.52.8
 
 require (
-	github.com/gofiber/jwt/v3 v3.3.10 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	golang.org/x/sync v0.15.0 // indirect
 )
 
 require (
-	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -24,7 +18,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
@@ -36,5 +29,5 @@ require (
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/gorm v1.30.0 // indirect
+	gorm.io/gorm v1.30.0
 )

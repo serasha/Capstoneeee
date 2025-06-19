@@ -1,3 +1,4 @@
+### --- MASYARAKAT ---
 ### CREATE MASYARAKAT
 POST http://localhost:8070/api/masyarakat
 Content-Type: application/json
@@ -5,7 +6,6 @@ Content-Type: application/json
 {
   "NamaLengkap": "Budi Santoso",
   "NIK": "1234567890123456",
-  "TanggalLahir": "1990-01-01T00:00:00Z",
   "KK": "1234567890123456",
   "Email": "budi@example.com",
   "Alamat": "Jl. Merdeka No. 1",
@@ -35,3 +35,154 @@ Content-Type: application/json
 
 ### DELETE MASYARAKAT
 DELETE http://localhost:8070/api/masyarakat/1
+
+### --- ADMIN ---
+### CREATE ADMIN
+POST http://localhost:8070/api/admin
+Content-Type: application/json
+
+{
+  "Username": "admin1",
+  "Password": "password123",
+  "NamaAdmin": "Admin Satu",
+  "EmailAdmin": "admin1@example.com",
+  "StatusAktif": true
+}
+
+### GET ALL ADMIN
+GET http://localhost:8070/api/admin
+
+### GET ADMIN BY ID
+GET http://localhost:8070/api/admin/1
+
+### UPDATE ADMIN
+PUT http://localhost:8070/api/admin/1
+Content-Type: application/json
+
+{
+  "NamaAdmin": "Admin Satu Update",
+  "StatusAktif": false
+}
+
+### DELETE ADMIN
+DELETE http://localhost:8070/api/admin/1
+
+### --- SUPERADMIN ---
+### CREATE SUPERADMIN
+POST http://localhost:8070/api/superadmin
+Content-Type: application/json
+
+{
+  "NamaSuperAdmin": "Super Admin",
+  "Username": "superadmin",
+  "Password": "superpassword",
+  "EmailSuperAdmin": "superadmin@example.com",
+  "StatusAktif": true,
+  "HakAkses": "all"
+}
+
+### GET ALL SUPERADMIN
+GET http://localhost:8070/api/superadmin
+
+### GET SUPERADMIN BY ID
+GET http://localhost:8070/api/superadmin/1
+
+### UPDATE SUPERADMIN
+PUT http://localhost:8070/api/superadmin/1
+Content-Type: application/json
+
+{
+  "NamaSuperAdmin": "Super Admin Update",
+  "StatusAktif": false
+}
+
+### DELETE SUPERADMIN
+DELETE http://localhost:8070/api/superadmin/1
+
+### --- PENDAFTARAN ---
+### CREATE PENDAFTARAN
+POST http://localhost:8070/api/pendaftaran
+Content-Type: application/json
+
+{
+  "NamaPendaftar": "Budi Santoso",
+  "AlamatPendaftar": "Jl. Merdeka No. 1",
+  "WaktuPendaftaran": "2024-06-19T10:00:00Z",
+  "TanggalPendaftar": "2024-06-19T00:00:00Z",
+  "StatusPendaftar": "pending",
+  "JenisLayanan": "KTP",
+  "CaraPendaftar": "online",
+  "DokumenAdministrasi": "",
+  "MasyarakatID": 1
+}
+
+### GET ALL PENDAFTARAN
+GET http://localhost:8070/api/pendaftaran
+
+### GET PENDAFTARAN BY ID
+GET http://localhost:8070/api/pendaftaran/1
+
+### UPDATE PENDAFTARAN
+PUT http://localhost:8070/api/pendaftaran/1
+Content-Type: application/json
+
+{
+  "StatusPendaftar": "approved"
+}
+
+### DELETE PENDAFTARAN
+DELETE http://localhost:8070/api/pendaftaran/1
+
+### --- MENGELOLA ---
+### CREATE MENGELOLA
+POST http://localhost:8070/api/mengelola
+Content-Type: application/json
+
+{
+  "AdminID": 1
+}
+
+### GET ALL MENGELOLA
+GET http://localhost:8070/api/mengelola
+
+### GET MENGELOLA BY ID
+GET http://localhost:8070/api/mengelola/1
+
+### UPDATE MENGELOLA
+PUT http://localhost:8070/api/mengelola/1
+Content-Type: application/json
+
+{
+  "AdminID": 1
+}
+
+### DELETE MENGELOLA
+DELETE http://localhost:8070/api/mengelola/1
+
+### --- DIKELOLA ---
+### CREATE DIKELOLA
+POST http://localhost:8070/api/dikelola
+Content-Type: application/json
+
+{
+  "PendaftaranID": 1,
+  "AdminID": 1
+}
+
+### GET ALL DIKELOLA
+GET http://localhost:8070/api/dikelola
+
+### GET DIKELOLA BY ID
+GET http://localhost:8070/api/dikelola/1
+
+### UPDATE DIKELOLA
+PUT http://localhost:8070/api/dikelola/1
+Content-Type: application/json
+
+{
+  "PendaftaranID": 1,
+  "AdminID": 1
+}
+
+### DELETE DIKELOLA
+DELETE http://localhost:8070/api/dikelola/1

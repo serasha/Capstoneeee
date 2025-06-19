@@ -1,74 +1,80 @@
 package handlers
 
 import (
-	"my-app/backend/models"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"my-app/backend/models"
+	"log"
 )
 
-// Create
+func GetAllMasyarakat(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var masyarakat []models.Masyarakat
+		if err := db.Find(&masyarakat).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal mengambil data"})
+		}
+		return c.JSON(masyarakat)
+	}
+}
+
 func CreateMasyarakat(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var input models.Masyarakat
 		if err := c.BodyParser(&input); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid input"})
+			return c.Status(400).JSON(fiber.Map{"error": "Input tidak valid"})
 		}
+
+		// Validasi dasar
+		if input.NamaLengkap == "" || len(input.NIK) != 16 {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Nama lengkap wajib diisi dan NIK harus 16 digit",
+			})
+		}
+
 		if err := db.Create(&input).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan data"})
+			log.Println("DB Error:", err)
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan data"})
 		}
 		return c.JSON(input)
 	}
 }
 
-// Read All
-func GetAllMasyarakat(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		var list []models.Masyarakat
-		if err := db.Find(&list).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data"})
-		}
-		return c.JSON(list)
-	}
-}
-
-// Read by ID
-func GetMasyarakatByID(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		id := c.Params("id")
-		var item models.Masyarakat
-		if err := db.First(&item, id).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data tidak ditemukan"})
-		}
-		return c.JSON(item)
-	}
-}
-
-// Update
 func UpdateMasyarakat(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id := c.Params("id")
-		var item models.Masyarakat
-		if err := db.First(&item, id).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		var masyarakat models.Masyarakat
+		if err := db.First(&masyarakat, id).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
 		}
 
-		var updateData models.Masyarakat
-		if err := c.BodyParser(&updateData); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Data tidak valid"})
+		var input models.Masyarakat
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Input tidak valid"})
 		}
 
-		db.Model(&item).Updates(updateData)
-		return c.JSON(item)
+		if input.NamaLengkap == "" || len(input.NIK) != 16 {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Nama lengkap wajib diisi dan NIK harus 16 digit",
+			})
+		}
+
+		input.ID = masyarakat.ID
+		if err := db.Save(&input).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal memperbarui data"})
+		}
+		return c.JSON(input)
 	}
 }
-
-// Delete
 func DeleteMasyarakat(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id := c.Params("id")
-		if err := db.Delete(&models.Masyarakat{}, id).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		var masyarakat models.Masyarakat
+		if err := db.First(&masyarakat, id).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		if err := db.Delete(&masyarakat).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
 		}
 		return c.JSON(fiber.Map{"message": "Data berhasil dihapus"})
 	}
-}
+}	
