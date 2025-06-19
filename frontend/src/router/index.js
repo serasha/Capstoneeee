@@ -1,12 +1,31 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../pages/Login.vue'
 import Daftar from '../pages/Daftar.vue'
-import LandingPage from '../pages/LandingPage.vue'
+import Home from '../pages/Home.vue'
+import Userlayout from '../Layouts/UserLayout.vue'
 
 const routes = [
-  { path: '/', component: LandingPage },
-  { path: '/login', component: Login },
-  { path: '/daftar', component: Daftar }
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/daftar',
+    name: 'Daftar',
+    component: Daftar
+  },
+  {
+    path: '/',
+    component: Userlayout,
+    children: [
+      {
+        path: '',
+        name: 'Home',
+        component: Home
+      }
+    ]
+  }
 ]
 
 const router = createRouter({
