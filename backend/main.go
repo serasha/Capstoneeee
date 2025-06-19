@@ -38,6 +38,7 @@ func main() {
 	err := database.DB.AutoMigrate(
     	&models.Admin{},
     	&models.Masyarakat{},
+		&models.Mendaftar{},
     	&models.Pendaftaran{},
    		&models.Mengelola{},
     	&models.Dikelola{},

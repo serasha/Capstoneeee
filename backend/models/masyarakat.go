@@ -11,7 +11,8 @@ type Masyarakat struct {
 	NamaLengkap     string         `json:"nama_lengkap"`
 	NIK             string         `gorm:"unique" json:"nik"`
 	KK              string         `json:"kk"`
-	Email           string         `json:"email"`
+	Email           string         `gorm:"unique" json:"email"`
+	Password        string         `json:"password"`
 	Alamat          string         `json:"alamat"`
 	NomorTelepon    string         `json:"nomor_telepon"`
 	KtpSuami        string         `json:"ktp_suami"`

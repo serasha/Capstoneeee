@@ -2,6 +2,7 @@
 package handlers
 
 import (
+	"time"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"my-app/backend/models"
@@ -85,3 +86,58 @@ func RegisterAdmin(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+func LoginMasyarakat(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var input LoginInput
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Format login tidak valid",
+			})
+		}
+
+		var masyarakat models.Masyarakat
+		if err := db.Where("email = ? AND password = ?", input.Username, input.Password).First(&masyarakat).Error; err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Email atau password salah",
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"message": "Login masyarakat berhasil",
+			"data":    masyarakat,
+		})
+	}
+}
+
+func RegisterMasyarakat(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var input models.Masyarakat
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Input tidak valid",
+			})
+		}
+
+		// Validasi minimal
+		if input.NamaLengkap == "" || input.NIK == "" || input.Email == "" || input.Password == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Nama lengkap, NIK, Email, dan Password wajib diisi",
+			})
+		}
+
+		input.TglPendaftaran = time.Now()
+
+		if err := db.Create(&input).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Gagal menyimpan data masyarakat",
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"message": "Registrasi masyarakat berhasil",
+			"data":    input,
+		})
+	}
+}
+
