@@ -1,15 +1,13 @@
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/Footer.vue'
-import HeroSection from '@/components/HeroSection.vue';
 </script>
 
 <template>
   <div class="layout-container">
     <Navbar />
-    <HeroSection/>
     <main class="content-wrapper">
-      <slot />
+       <router-view />
     </main>
     <Footer />
   </div>
