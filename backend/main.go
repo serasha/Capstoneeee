@@ -59,14 +59,21 @@ func main() {
 		return c.JSON(fiber.Map{"message": "Halo dari Fiber!"})
 	})
 
-	routes.RegisterRoutes(app, database.DB)
+	// Register routes
+	routes.SetupLoginRoutes(app)
+	routes.SetupDaftarRoutes(app)
 
-	// Serve frontend
-	app.Static("/", "../frontend/dist")
+app.Use(func(c *fiber.Ctx) error {
+	// Lewati kalau ini permintaan API
+	if len(c.Path()) >= 4 && c.Path()[:4] == "/api" {
+		return c.Next()
+	}
+	return c.SendFile("../frontend/dist/index.html")
+})
 
 	// Start server
 	if err := app.Listen(":8070"); err != nil {
 		log.Fatal("Gagal menjalankan server:", err)
 	}
-}
 
+}

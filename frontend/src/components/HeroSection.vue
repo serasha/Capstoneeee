@@ -14,8 +14,33 @@
 
         <!-- Kanan: Lottie Animation -->
         <div class="col-md-6 text-center mt-4 mt-md-0">
-          <div class="lottie-container">
-            <!-- Option 1: Menggunakan lottie-web langsung -->
+          <div class="lottie-container" :class="{ loaded: isLoaded }">
+            <!-- Spinner SVG -->
+            <div v-if="!isLoaded" class="custom-spinner">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  fill="none"
+                  stroke="#fff"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-dasharray="100"
+                  stroke-dashoffset="60"
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    from="0 24 24"
+                    to="360 24 24"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+              </svg>
+            </div>
+            <!-- Lottie animation container -->
             <div ref="lottieContainer" class="lottie-animation"></div>
             
             <!-- Option 2: Jika menggunakan Vue Lottie component -->
@@ -47,7 +72,8 @@ export default {
   data() {
     return {
       animationData: null,
-      lottieAnimation: null
+      lottieAnimation: null,
+      isLoaded: false
     }
   },
   mounted() {
@@ -76,7 +102,9 @@ export default {
           // animationData: animationData.default // Untuk load dari file lokal
         })
 
-        // Event listeners untuk kontrol animasi
+        this.lottieAnimation.addEventListener('DOMLoaded', () => {
+          this.isLoaded = true
+        })
         this.lottieAnimation.addEventListener('complete', () => {
           console.log('Animation completed')
         })
@@ -85,6 +113,7 @@ export default {
         console.error('Error loading animation:', error)
         // Fallback ke static illustration jika gagal load
         this.showFallbackIllustration()
+        this.isLoaded = true // Hide spinner on error/fallback
       }
     },
 
@@ -153,6 +182,7 @@ export default {
   position: relative;
   max-width: 100%;
   height: auto;
+  min-height: 320px;
 }
 
 .lottie-animation {
@@ -169,6 +199,26 @@ export default {
   height: auto;
   max-width: 400px;
   filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2));
+}
+
+/* Custom SVG Spinner */
+.custom-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.lottie-container.loaded .custom-spinner {
+  display: none;
 }
 
 h1 {
@@ -221,30 +271,5 @@ p {
     padding-left: 2rem !important;
     padding-right: 2rem !important;
   }
-}
-
-/* Loading state */
-.lottie-container::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top: 3px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  z-index: 1;
-}
-
-.lottie-container.loaded::before {
-  display: none;
-}
-
-@keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 </style>

@@ -29,12 +29,13 @@
 
       <!-- Right side buttons -->
       <div class="d-flex gap-2 mb-0 me-4 daftar-masuk-group">
-        <a href="/daftar" class="btn btn-outline-warning daftar-btn">
+        <router-link to="/daftar" class="btn btn-outline-warning daftar-btn">
           Daftar
-        </a>
-        <a href="/masuk" class="btn btn-warning masuk-btn">
+        </router-link>
+        <router-link to="/login" class="btn btn-warning masuk-btn">
           Masuk
-        </a>
+        </router-link>
+       
       </div>
     </div>
   </nav>
