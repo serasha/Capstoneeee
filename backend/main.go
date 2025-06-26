@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"path/filepath"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -17,12 +19,12 @@ type App struct {
 	DB *gorm.DB
 }
 
-
 func main() {
-	 database.ConnectDB()
+	// 🔌 Koneksi database
+	database.ConnectDB()
 
-
-	 database.DB.Migrator().DropTable(
+	// 🔄 Drop table lama (opsional)
+	database.DB.Migrator().DropTable(
 		&models.Mengelola{},
 		&models.Dikelola{},
 		&models.Pendaftaran{},
@@ -31,50 +33,51 @@ func main() {
 		&models.SuperAdmin{},
 	)
 	log.Println("Dropping old tables...")
-	log.Println("Migrating new tables...")
 
-
-	// Migrasi semua tabel
+	// ⚙️ Migrasi ulang tabel
 	err := database.DB.AutoMigrate(
-    	&models.Admin{},
-    	&models.Masyarakat{},
+		&models.Admin{},
+		&models.Masyarakat{},
 		&models.Mendaftar{},
-    	&models.Pendaftaran{},
-   		&models.Mengelola{},
-    	&models.Dikelola{},
-    	&models.SuperAdmin{},
-    )
-    if err != nil {
-        log.Fatal("Migrasi gagal:", err)
-    }
+		&models.Pendaftaran{},
+		&models.Mengelola{},
+		&models.Dikelola{},
+		&models.SuperAdmin{},
+	)
+	if err != nil {
+		log.Fatal("Migrasi gagal:", err)
+	}
+	log.Println("Migrasi berhasil!")
 
-    log.Println("Migrasi berhasil!")
-
-	// Fiber setup
+	// 🚀 Setup Fiber
 	app := fiber.New()
 	app.Use(logger.New())
 	app.Use(cors.New())
 
-	// Routes
+	// 🧪 Contoh API endpoint sederhana
 	app.Get("/api/hello", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"message": "Halo dari Fiber!"})
 	})
 
-	// Register routes
-	routes.SetupLoginRoutes(app)
-	routes.SetupDaftarRoutes(app)
+	// 🔀 Register route API (login & daftar)
+	api := app.Group("/api") // grup semua route API
+	routes.SetupLoginRoutes(api)
+	routes.SetupDaftarRoutes(api)
 
-app.Use(func(c *fiber.Ctx) error {
-	// Lewati kalau ini permintaan API
-	if len(c.Path()) >= 4 && c.Path()[:4] == "/api" {
-		return c.Next()
-	}
-	return c.SendFile("../frontend/dist/index.html")
-})
+	// 📦 Serve static files (Vue build result)
+	app.Static("/", "../frontend/dist")
 
-	// Start server
+	// 🔁 Fallback ke index.html untuk semua non-API route (SPA mode Vue)
+	app.Use(func(c *fiber.Ctx) error {
+		// Skip jika request ke API
+		if strings.HasPrefix(c.Path(), "/api") {
+			return c.Next()
+		}
+		return c.SendFile(filepath.Join("..", "frontend", "dist", "index.html"))
+	})
+
+	// 🔊 Jalankan server
 	if err := app.Listen(":8070"); err != nil {
 		log.Fatal("Gagal menjalankan server:", err)
 	}
-
 }

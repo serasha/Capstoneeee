@@ -7,6 +7,13 @@ import (
 	"my-app/backend/handlers"
 )
 
+type Masyarakat struct {
+	gorm.Model
+	Nama     string `json:"nama"`
+	Email    string `json:"email" gorm:"unique"`
+	Password string `json:"password"`
+}
+
 func MasyarakatRoutes(app *fiber.App, db *gorm.DB) {
 	app.Get("/api/masyarakat", handlers.GetAllMasyarakat(db))
 	app.Post("/api/masyarakat", handlers.CreateMasyarakat(db))
