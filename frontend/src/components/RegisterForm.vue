@@ -307,16 +307,29 @@
         </button>
       </div>
     </form>
+
+    <SuccessModal
+      :visible="showSuccessModal"
+      :userData="{ fullName: formData.namaKepalaKeluarga }"
+      @close="showSuccessModal = false"
+      @view-status="goToStatus"
+      @go-to-dashboard="goToDashboard"
+      @go-to-home="goToHome"
+    />
   </div>
 </template>
 
 <script>
+import SuccessModal from './SuccessModal.vue';
+
 export default {
   name: 'FormulirPendaftaran',
+  components: { SuccessModal },
   data() {
     return {
       isSubmitting: false,
       uploadedFiles: [],
+      showSuccessModal: false,
       formData: {
         namaKepalaKeluarga: '',
         jenisKelamin: '',
@@ -345,8 +358,7 @@ export default {
   },
   methods: {
     goBack() {
-      this.$emit('back');
-      // or use this.$router.go(-1) if using Vue Router
+      this.$router.go(-1);
     },
     triggerFileUpload() {
       this.$refs.fileInput.click();
@@ -373,14 +385,7 @@ export default {
         console.log('Form Data:', this.formData);
         console.log('Uploaded Files:', this.uploadedFiles);
         
-        // Emit success event to parent component
-        this.$emit('form-submitted', {
-          formData: this.formData,
-          files: this.uploadedFiles
-        });
-        
-        // Show success message
-        alert('Pendaftaran berhasil dikirim!');
+        this.showSuccessModal = true; // Tampilkan modal setelah submit sukses
         
       } catch (error) {
         console.error('Error submitting form:', error);
@@ -388,7 +393,19 @@ export default {
       } finally {
         this.isSubmitting = false;
       }
-    }
+    },
+    goToStatus() {
+      this.showSuccessModal = false;
+      this.$router.push('/status');
+    },
+    goToDashboard() {
+      this.showSuccessModal = false;
+      this.$router.push('/dashboard');
+    },
+    goToHome() {
+      this.showSuccessModal = false;
+      this.$router.push('/');
+    },
   }
 }
 </script>

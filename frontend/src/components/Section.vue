@@ -11,40 +11,36 @@
         <!-- Service Cards -->
         <div class="row justify-content-center g-4 mb-5">
           <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="service-card text-center p-4">
-              <div class="service-icon mb-3">
-                <div class="icon-document">
-                  <div class="document-base"></div>
-                  <div class="document-lines"></div>
-                  <div class="pencil"></div>
-                </div>
+            <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToFormulir">
+              <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                <span class="service-icon" style="font-size:2.5rem;">📝</span>
               </div>
-              <h6 class="service-title">Pendaftaran<br>Formulir</h6>
+              <div class="service-title text-center">
+                <div class="title-line">Pendaftaran</div>
+                <div class="title-line">Formulir</div>
+              </div>
             </div>
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="service-card text-center p-4">
-              <div class="service-icon mb-3">
-                <div class="icon-status">
-                  <div class="monitor-base"></div>
-                  <div class="monitor-screen">
-                    <div class="chart-pie"></div>
-                    <div class="info-icon">i</div>
-                  </div>
-                </div>
+            <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToStatus">
+              <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                <span class="service-icon" style="font-size:2.5rem;">📊</span>
               </div>
-              <h6 class="service-title">Pantau Status<br>Pengajuan</h6>
+              <div class="service-title text-center">
+                <div class="title-line">Pantau Status</div>
+                <div class="title-line">Pengajuan</div>
+              </div>
             </div>
           </div>
           <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="service-card text-center p-4">
-              <div class="service-icon mb-3">
-                <div class="icon-support">
-                  <div class="person-avatar"></div>
-                  <div class="support-badge">SUPPORT</div>
-                </div>
+            <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToBantuan">
+              <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                <span class="service-icon" style="font-size:2.5rem;">💬</span>
               </div>
-              <h6 class="service-title">Bantuan &<br>Konsultasi</h6>
+              <div class="service-title text-center">
+                <div class="title-line">Bantuan &</div>
+                <div class="title-line">Konsultasi</div>
+              </div>
             </div>
           </div>
         </div>
@@ -96,31 +92,9 @@
             </div>
           </div>
           <div class="col-lg-6">
+            <!-- Ganti ilustrasi dengan gambar Sec-1.png -->
             <div class="process-illustration text-center">
-              <div class="illustration-container">
-                <div class="device-mockup">
-                  <div class="device-screen">
-                    <div class="form-preview">
-                      <div class="form-header"></div>
-                      <div class="form-lines">
-                        <div class="form-line"></div>
-                        <div class="form-line"></div>
-                        <div class="form-line short"></div>
-                        <div class="form-line"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="character">
-                  <div class="character-body"></div>
-                  <div class="character-head"></div>
-                </div>
-                <div class="floating-elements">
-                  <div class="cloud cloud-1"></div>
-                  <div class="cloud cloud-2"></div>
-                  <div class="cloud cloud-3"></div>
-                </div>
-              </div>
+              <img src="/Sec-1.png" alt="Ilustrasi Pendaftaran" class="img-fluid" style="max-width: 350px;" />
             </div>
           </div>
         </div>
@@ -131,54 +105,33 @@
     <section class="benefits-section py-5">
       <div class="container">
         <div class="row align-items-center">
-          <div class="col-lg-6 mb-4 mb-lg-0">
-            <div class="benefits-illustration text-center">
-              <div class="world-map-container">
-                <div class="world-map">
-                  <div class="map-circle"></div>
-                  <div class="location-pin"></div>
-                </div>
-                <div class="people-group">
-                  <div class="person person-1">
-                    <div class="person-head"></div>
-                    <div class="person-body"></div>
-                  </div>
-                  <div class="person person-2">
-                    <div class="person-head"></div>
-                    <div class="person-body"></div>
-                  </div>
-                  <div class="person person-3">
-                    <div class="person-head"></div>
-                    <div class="person-body"></div>
-                  </div>
-                </div>
-                <div class="airplane">
-                  <i class="fas fa-plane"></i>
-                </div>
-              </div>
-            </div>
+          <!-- Pindahkan gambar Sec-2.png ke kiri -->
+          <div class="col-lg-6 mb-4 mb-lg-0 text-center">
+            <img src="/Sec-2.png" alt="Manfaat Transmigrasi" class="img-fluid" style="max-width: 350px;" />
           </div>
           <div class="col-lg-6">
             <h2 class="benefits-title mb-4">Manfaat Transmigrasi untuk Masyarakat Yogyakarta?</h2>
             <div class="benefits-list">
-              <div class="benefit-item d-flex mb-3">
-                <div class="benefit-icon me-3">
-                  <i class="fas fa-home"></i>
-                </div>
-                <span class="benefit-text">Lahan tempat tinggal dan pertanian di lokasi baru.</span>
-              </div>
-              <div class="benefit-item d-flex mb-3">
-                <div class="benefit-icon me-3">
-                  <i class="fas fa-graduation-cap"></i>
-                </div>
-                <span class="benefit-text">Pembinaan dan pelatihan keterampilan.</span>
-              </div>
-              <div class="benefit-item d-flex">
-                <div class="benefit-icon me-3">
-                  <i class="fas fa-hands-helping"></i>
-                </div>
-                <span class="benefit-text">Dukungan sarana dan prasarana dari pemerintah.</span>
-              </div>
+              <ul class="mb-0">
+                <li class="benefit-item d-flex mb-3">
+                  <div class="benefit-icon me-3">
+                    <i class="bi bi-house-door"></i>
+                  </div>
+                  <span class="benefit-text">Lahan tempat tinggal dan pertanian di lokasi baru.</span>
+                </li>
+                <li class="benefit-item d-flex mb-3">
+                  <div class="benefit-icon me-3">
+                    <i class="bi bi-mortarboard"></i>
+                  </div>
+                  <span class="benefit-text">Pembinaan dan pelatihan keterampilan.</span>
+                </li>
+                <li class="benefit-item d-flex">
+                  <div class="benefit-icon me-3">
+                    <i class="bi bi-people"></i>
+                  </div>
+                  <span class="benefit-text">Dukungan sarana dan prasarana dari pemerintah.</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -192,6 +145,17 @@ export default {
   name: 'LayananTransmigrasi',
   mounted() {
     // Add any initialization logic here if needed
+  },
+  methods: {
+    goToFormulir() {
+      this.$router.push('/RegisterForm');
+    },
+    goToStatus() {
+      this.$router.push('/status');
+    },
+    goToBantuan() {
+      this.$router.push('/bantuan');
+    }
   }
 }
 </script>
@@ -207,6 +171,9 @@ export default {
   --light-bg: #F8F9FA;
   --dark-text: #2C3E50;
   --light-text: #6C757D;
+  --card-bg: #FFE6E6;
+  --card-border: #C01B1B;
+  --icon-bg: #fbdada;
 }
 
 /* General Styles */
@@ -236,235 +203,47 @@ export default {
   color: #666;
 }
 
-/* Service Cards */
+/* Service Cards - New Design */
 .service-card {
-  background: #ffe4e8;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-  border: 2px solid #ff9aa2;
-  height: 100%;
+  background-color: #FFE6E6;
+  border: 3px solid #C01B1B;
+  width: 240px;
+  height: 260px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .service-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  border-color: #ff6b77;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(192, 27, 27, 0.2) !important;
+}
+
+.icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background-color: var(--icon-bg);
+  border: 2px solid rgba(192, 27, 27, 0.1);
 }
 
 .service-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 2.5rem;
+  color: #C01B1B;
 }
 
 .service-title {
-  font-weight: 600;
-  color: #d63447;
-  margin: 0;
-  font-size: 1rem;
+  color: #C01B1B;
+  font-weight: bold;
+  font-size: 1.25rem;
   line-height: 1.3;
 }
 
-/* Custom Icons */
-/* Document Icon */
-.icon-document {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.title-line {
+  margin-bottom: 0.25rem;
 }
 
-.document-base {
-  width: 35px;
-  height: 45px;
-  background: #4a90e2;
-  border-radius: 4px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.document-base::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 12px;
-  height: 12px;
-  background: #4a90e2;
-  clip-path: polygon(0 100%, 100% 0, 100% 100%);
-}
-
-.document-lines {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -40%);
-  width: 20px;
-}
-
-.document-lines::before,
-.document-lines::after {
-  content: '';
-  display: block;
-  height: 2px;
-  background: white;
-  margin: 4px 0;
-  border-radius: 1px;
-}
-
-.pencil {
-  position: absolute;
-  bottom: 15px;
-  right: 10px;
-  width: 20px;
-  height: 3px;
-  background: #ffa500;
-  border-radius: 2px;
-  transform: rotate(45deg);
-}
-
-.pencil::before {
-  content: '';
-  position: absolute;
-  right: -3px;
-  top: -1px;
-  width: 0;
-  height: 0;
-  border-left: 3px solid #ff8c00;
-  border-top: 2.5px solid transparent;
-  border-bottom: 2.5px solid transparent;
-}
-
-/* Monitor/Status Icon */
-.icon-status {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.monitor-base {
-  width: 50px;
-  height: 35px;
-  background: #34495e;
-  border-radius: 4px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
-}
-
-.monitor-base::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 6px;
-  background: #34495e;
-  border-radius: 0 0 4px 4px;
-}
-
-.monitor-screen {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
-  width: 42px;
-  height: 27px;
-  background: #3498db;
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.chart-pie {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: conic-gradient(#e74c3c 0deg 120deg, #f39c12 120deg 200deg, #2ecc71 200deg 360deg);
-  position: relative;
-}
-
-.info-icon {
-  position: absolute;
-  bottom: 5px;
-  right: 15px;
-  width: 12px;
-  height: 12px;
-  background: #3498db;
-  border: 2px solid white;
-  border-radius: 50%;
-  font-size: 8px;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-/* Support Icon */
-.icon-support {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.person-avatar {
-  width: 35px;
-  height: 35px;
-  background: #3498db;
-  border-radius: 50%;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.person-avatar::before {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 12px;
-  background: white;
-  border-radius: 50%;
-}
-
-.person-avatar::after {
-  content: '';
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 12px;
-  background: white;
-  border-radius: 10px 10px 0 0;
-}
-
-.support-badge {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #3498db;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 8px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
+.title-line:last-child {
+  margin-bottom: 0;
 }
 
 /* SPBE Section */
@@ -503,7 +282,7 @@ export default {
 
 .step-number {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: white;
+  color: black;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -520,109 +299,6 @@ export default {
   color: var(--dark-text);
   font-weight: 500;
   padding-top: 4px;
-}
-
-/* Process Illustration */
-.illustration-container {
-  position: relative;
-  padding: 2rem;
-}
-
-.device-mockup {
-  background: #2C3E50;
-  border-radius: 25px;
-  padding: 20px;
-  width: 250px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
-}
-
-.device-screen {
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  height: 300px;
-}
-
-.form-preview .form-header {
-  background: var(--primary-color);
-  height: 40px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.form-line {
-  background: #E9ECEF;
-  height: 12px;
-  border-radius: 6px;
-  margin-bottom: 15px;
-}
-
-.form-line.short {
-  width: 60%;
-}
-
-.character {
-  position: absolute;
-  bottom: -20px;
-  right: -30px;
-  z-index: 3;
-}
-
-.character-body {
-  width: 40px;
-  height: 60px;
-  background: var(--accent-color);
-  border-radius: 20px;
-}
-
-.character-head {
-  width: 25px;
-  height: 25px;
-  background: #FFCC8A;
-  border-radius: 50%;
-  margin: -5px auto 0;
-}
-
-.floating-elements {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-}
-
-.cloud {
-  background: var(--primary-color);
-  border-radius: 25px;
-  position: absolute;
-  opacity: 0.7;
-}
-
-.cloud-1 {
-  width: 60px;
-  height: 30px;
-  top: 20px;
-  left: 20px;
-  animation: float 3s ease-in-out infinite;
-}
-
-.cloud-2 {
-  width: 45px;
-  height: 25px;
-  top: 50px;
-  right: 30px;
-  animation: float 3s ease-in-out infinite 0.5s;
-}
-
-.cloud-3 {
-  width: 35px;
-  height: 20px;
-  bottom: 100px;
-  left: 50px;
-  animation: float 3s ease-in-out infinite 1s;
 }
 
 /* Benefits Section */
@@ -657,112 +333,13 @@ export default {
   font-weight: 500;
 }
 
-/* Benefits Illustration */
-.world-map-container {
-  position: relative;
-  padding: 2rem;
+.benefits-list ul {
+  padding-left: 0;
+  list-style: none;
 }
 
-.world-map {
-  position: relative;
-  margin: 0 auto;
-}
-
-.map-circle {
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(135deg, var(--success-color), var(--primary-color));
-  border-radius: 50%;
-  margin: 0 auto;
-  position: relative;
-  opacity: 0.9;
-}
-
-.location-pin {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
-  background: var(--accent-color);
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg) translate(-50%, -50%);
-}
-
-.people-group {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 15px;
-}
-
-.person {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.person-head {
-  width: 25px;
-  height: 25px;
-  background: #FFCC8A;
-  border-radius: 50%;
-  margin-bottom: 5px;
-}
-
-.person-body {
-  width: 30px;
-  height: 40px;
-  border-radius: 15px;
-}
-
-.person-1 .person-body {
-  background: var(--warning-color);
-}
-
-.person-2 .person-body {
-  background: var(--accent-color);
-}
-
-.person-3 .person-body {
-  background: var(--secondary-color);
-}
-
-.airplane {
-  position: absolute;
-  top: -30px;
-  right: -20px;
-  color: var(--primary-color);
-  font-size: 2rem;
-  animation: fly 4s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes fly {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  25% {
-    transform: translate(10px, -5px) rotate(5deg);
-  }
-  50% {
-    transform: translate(5px, -10px) rotate(-3deg);
-  }
-  75% {
-    transform: translate(-5px, -5px) rotate(3deg);
-  }
+.benefits-list li {
+  list-style-type: none;
 }
 
 /* Responsive Design */
@@ -777,32 +354,22 @@ export default {
     font-size: 1.5rem;
   }
   
-  .device-mockup {
+  .service-card {
     width: 200px;
+    height: 220px;
   }
   
-  .device-screen {
-    height: 250px;
-    padding: 15px;
+  .icon-wrapper {
+    width: 60px;
+    height: 60px;
   }
   
-  .map-circle {
-    width: 150px;
-    height: 150px;
+  .service-icon {
+    font-size: 2rem;
   }
   
-  .people-group {
-    gap: 10px;
-  }
-  
-  .person-head {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .person-body {
-    width: 25px;
-    height: 35px;
+  .service-title {
+    font-size: 1.1rem;
   }
 }
 
@@ -822,12 +389,22 @@ export default {
   }
   
   .service-card {
+    width: 180px;
+    height: 200px;
     margin-bottom: 1rem;
   }
   
-  .illustration-container,
-  .world-map-container {
-    padding: 1rem;
+  .icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .service-icon {
+    font-size: 1.5rem;
+  }
+  
+  .service-title {
+    font-size: 1rem;
   }
 }
 </style>

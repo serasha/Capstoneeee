@@ -12,46 +12,10 @@
           </p>
         </div>
 
-        <!-- Kanan: Lottie Animation -->
+        <!-- Kanan: Gambar Hero -->
         <div class="col-md-6 text-center mt-4 mt-md-0">
-          <div class="lottie-container" :class="{ loaded: isLoaded }">
-            <!-- Spinner SVG -->
-            <div v-if="!isLoaded" class="custom-spinner">
-              <svg width="48" height="48" viewBox="0 0 48 48">
-                <circle
-                  cx="24"
-                  cy="24"
-                  r="20"
-                  fill="none"
-                  stroke="#fff"
-                  stroke-width="4"
-                  stroke-linecap="round"
-                  stroke-dasharray="100"
-                  stroke-dashoffset="60"
-                >
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    from="0 24 24"
-                    to="360 24 24"
-                    dur="1s"
-                    repeatCount="indefinite"
-                  />
-                </circle>
-              </svg>
-            </div>
-            <!-- Lottie animation container -->
-            <div ref="lottieContainer" class="lottie-animation"></div>
-            
-            <!-- Option 2: Jika menggunakan Vue Lottie component -->
-            <!-- <lottie-animation
-              ref="anim" 
-              :animation-data="animationData"
-              :auto-play="true"
-              :loop="true"
-              :speed="1"
-              class="lottie-animation"
-            /> -->
+          <div class="hero-image-container">
+            <img src="/Hr.png" alt="Hero Ilustrasi" class="img-fluid hero-image" />
           </div>
         </div>
       </div>
@@ -60,96 +24,8 @@
 </template>
 
 <script>
-import lottie from 'lottie-web'
-// Jika menggunakan Vue Lottie component, uncomment line berikut:
-// import LottieAnimation from 'lottie-vuejs/src/LottieAnimation.vue'
-
 export default {
-  name: 'HeroSection',
-  // components: {
-  //   LottieAnimation // Jika menggunakan Vue Lottie component
-  // },
-  data() {
-    return {
-      animationData: null,
-      lottieAnimation: null,
-      isLoaded: false
-    }
-  },
-  mounted() {
-    this.loadLottieAnimation()
-  },
-  beforeUnmount() {
-    if (this.lottieAnimation) {
-      this.lottieAnimation.destroy()
-    }
-  },
-  methods: {
-    async loadLottieAnimation() {
-      try {
-        // Option 1: Load dari CDN LottieFiles (recommended)
-        const animationUrl = 'https://assets3.lottiefiles.com/packages/lf20_jcikwtux.json' // Contoh: Digital services animation
-        
-        // Option 2: Load dari file lokal
-        // const animationData = await import('@/assets/animations/hero-animation.json')
-        
-        this.lottieAnimation = lottie.loadAnimation({
-          container: this.$refs.lottieContainer,
-          renderer: 'svg',
-          loop: true,
-          autoplay: true,
-          path: animationUrl // Untuk load dari URL
-          // animationData: animationData.default // Untuk load dari file lokal
-        })
-
-        this.lottieAnimation.addEventListener('DOMLoaded', () => {
-          this.isLoaded = true
-        })
-        this.lottieAnimation.addEventListener('complete', () => {
-          console.log('Animation completed')
-        })
-
-      } catch (error) {
-        console.error('Error loading animation:', error)
-        // Fallback ke static illustration jika gagal load
-        this.showFallbackIllustration()
-        this.isLoaded = true // Hide spinner on error/fallback
-      }
-    },
-
-    showFallbackIllustration() {
-      // Fallback SVG jika Lottie gagal load
-      this.$refs.lottieContainer.innerHTML = `
-        <svg viewBox="0 0 400 300" class="fallback-illustration">
-          <rect width="400" height="300" fill="#7CB342" rx="20"/>
-          <circle cx="150" cy="120" r="30" fill="#FFDBCB"/>
-          <rect x="130" y="150" width="40" height="60" fill="#3F51B5" rx="10"/>
-          <circle cx="250" cy="120" r="30" fill="#FFDBCB"/>
-          <rect x="230" y="150" width="40" height="60" fill="#E91E63" rx="10"/>
-          <text x="200" y="250" text-anchor="middle" fill="white" font-size="16">Digital Services</text>
-        </svg>
-      `
-    },
-
-    // Method untuk kontrol animasi
-    playAnimation() {
-      if (this.lottieAnimation) {
-        this.lottieAnimation.play()
-      }
-    },
-
-    pauseAnimation() {
-      if (this.lottieAnimation) {
-        this.lottieAnimation.pause()
-      }
-    },
-
-    stopAnimation() {
-      if (this.lottieAnimation) {
-        this.lottieAnimation.stop()
-      }
-    }
-  }
+  name: 'HeroSection'
 }
 </script>
 
@@ -178,47 +54,22 @@ export default {
   background-size: 50px 50px, 30px 30px;
 }
 
-.lottie-container {
+.hero-image-container {
   position: relative;
   max-width: 100%;
-  height: auto;
   min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.lottie-animation {
+.hero-image {
   width: 100%;
   height: auto;
   max-width: 650px;
   max-height: 500px;
   margin: 0 auto;
   filter: drop-shadow(0 15px 40px rgba(0,0,0,0.25));
-}
-
-.fallback-illustration {
-  width: 100%;
-  height: auto;
-  max-width: 400px;
-  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.2));
-}
-
-/* Custom SVG Spinner */
-.custom-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  background: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.lottie-container.loaded .custom-spinner {
-  display: none;
 }
 
 h1 {
@@ -262,7 +113,7 @@ p {
     line-height: 1.6;
   }
   
-  .lottie-animation {
+  .hero-image {
     max-width: 400px;
     max-height: 320px;
   }

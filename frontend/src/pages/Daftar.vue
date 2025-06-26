@@ -1,173 +1,113 @@
 <template>
   <div class="register-container">
-    <div class="container-fluid vh-100">
-      <div class="row h-100 align-items-center">
-        <!-- Left Side - Illustration -->
-        <div class="col-12 col-lg-6 d-none d-lg-flex justify-content-center align-items-center">
-          <div class="illustration-wrapper">
-            <div class="illustration">
-              <!-- Phone mockup -->
-              <div class="phone-mockup">
-                <div class="phone-screen">
-                  <div class="app-header">
-                    <div class="app-icon"></div>
-                    <div class="app-lines">
-                      <div class="line line-1"></div>
-                      <div class="line line-2"></div>
-                    </div>
-                  </div>
-                  <div class="form-preview">
-                    <div class="input-line"></div>
-                    <div class="input-line"></div>
-                    <div class="input-line short"></div>
-                    <div class="dots">••••••••</div>
-                  </div>
-                  <div class="signup-btn">SIGN UP</div>
-                </div>
-              </div>
-              
-              <!-- Character -->
-              <div class="character">
-                <div class="character-head"></div>
-                <div class="character-body"></div>
-                <div class="character-arm"></div>
-                <div class="character-legs"></div>
-              </div>
-              
-              <!-- Security elements -->
-              <div class="security-lock">
-                <div class="lock-body"></div>
-                <div class="lock-shackle"></div>
-                <div class="lock-keyhole"></div>
-              </div>
-              
-              <!-- Floating elements -->
-              <div class="floating-elements">
-                <div class="float-element element-1"></div>
-                <div class="float-element element-2"></div>
-                <div class="float-element element-3"></div>
-              </div>
-            </div>
+    <div class="container-fluid p-0 position-relative">
+      <!-- Back Button (pojok kiri atas) -->
+      <button class="btn btn-back position-absolute top-0 start-0 m-4" @click="goToHome">
+        <i class="fas fa-arrow-left me-2"></i> Kembali ke Beranda
+      </button>
+
+      <div class="row min-vh-100 g-0">
+        <!-- Left side - Image -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-light-pink">
+          <div class="image-wrapper">
+            <img src="/regis.png" alt="Registration Illustration" class="img-fluid registration-image">
           </div>
         </div>
-        
-        <!-- Right Side - Registration Form -->
-        <div class="col-12 col-lg-6">
-          <div class="register-form-wrapper">
-            <div class="card border-0 shadow-lg">
-              <div class="card-body p-5">
-                <div class="text-center mb-4">
-                  <h2 class="register-title">Daftar</h2>
-                  <p class="welcome-text">Selamat datang di layanan kami!</p>
-                </div>
-                
-                <form @submit.prevent="handleRegister">
-                  <div class="mb-4">
-                    <label for="fullName" class="form-label fw-semibold">Nama Lengkap</label>
-                    <input 
-                      type="text" 
-                      class="form-control form-control-lg custom-input" 
-                      id="fullName"
-                      v-model="registerForm.fullName"
-                      placeholder="Masukkan nama lengkap Anda"
-                      :class="{ 'is-invalid': errors.fullName }"
-                      required
-                    >
-                    <div v-if="errors.fullName" class="invalid-feedback">
-                      {{ errors.fullName }}
-                    </div>
-                  </div>
-                  
-                  <div class="mb-4">
-                    <label for="username" class="form-label fw-semibold">Username</label>
-                    <input 
-                      type="text" 
-                      class="form-control form-control-lg custom-input" 
-                      id="username"
-                      v-model="registerForm.username"
-                      placeholder="Masukkan username Anda"
-                      :class="{ 'is-invalid': errors.username }"
-                      required
-                    >
-                    <div v-if="errors.username" class="invalid-feedback">
-                      {{ errors.username }}
-                    </div>
-                  </div>
-                  
-                  <div class="mb-4">
-                    <label for="password" class="form-label fw-semibold">Kata Sandi</label>
-                    <div class="input-group">
-                      <input 
-                        :type="showPassword ? 'text' : 'password'" 
-                        class="form-control form-control-lg custom-input" 
-                        id="password"
-                        v-model="registerForm.password"
-                        placeholder="Masukkan kata sandi Anda"
-                        :class="{ 'is-invalid': errors.password }"
-                        required
-                      >
-                      <button 
-                        class="btn btn-outline-secondary password-toggle" 
-                        type="button"
-                        @click="togglePassword"
-                      >
-                        <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                      </button>
-                      <div v-if="errors.password" class="invalid-feedback">
-                        {{ errors.password }}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="mb-4">
-                    <label for="confirmPassword" class="form-label fw-semibold">Ulangi Kata Sandi</label>
-                    <div class="input-group">
-                      <input 
-                        :type="showConfirmPassword ? 'text' : 'password'" 
-                        class="form-control form-control-lg custom-input" 
-                        id="confirmPassword"
-                        v-model="registerForm.confirmPassword"
-                        placeholder="Masukkan kata sandi Anda"
-                        :class="{ 'is-invalid': errors.confirmPassword }"
-                        required
-                      >
-                      <button 
-                        class="btn btn-outline-secondary password-toggle" 
-                        type="button"
-                        @click="toggleConfirmPassword"
-                      >
-                        <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                      </button>
-                      <div v-if="errors.confirmPassword" class="invalid-feedback">
-                        {{ errors.confirmPassword }}
-                      </div>
-                    </div>
-                    <div class="text-end mt-2">
-                      <a href="#" class="forgot-link" @click.prevent="forgotPassword">
-                        Lupa Kata Sandi?
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div class="d-grid mb-4">
-                    <button 
-                      type="submit" 
-                      class="btn btn-primary btn-lg register-btn"
-                      :disabled="isLoading"
-                    >
-                      <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                      {{ isLoading ? 'Memproses...' : 'DAFTAR' }}
-                    </button>
-                  </div>
-                  
-                  <div class="text-center">
-                    <span class="text-muted">Sudah punya akun? </span>
-                    <a href="#" class="login-link fw-semibold" @click.prevent="goToLogin">
-                      Masuk di sini
-                    </a>
-                  </div>
-                </form>
+
+        <!-- Right side - Registration Form -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center" style="background: #ffffff;">
+          <div class="form-wrapper w-100">
+            <div class="form-container">
+              <div class="text-start mb-4">
+                <h1 class="form-title mb-2">Daftar</h1>
+                <p class="form-subtitle mb-0">Selamat datang di layanan kami!</p>
               </div>
+
+              <form @submit.prevent="handleSubmit">
+                <!-- Nama Lengkap -->
+                <div class="mb-4">
+                  <label class="form-label-custom mb-3">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    class="form-control custom-input"
+                    placeholder="Masukkan username Anda"
+                    v-model="formData.namaLengkap"
+                    :class="{ 'is-invalid': errors.namaLengkap }"
+                  />
+                  <div v-if="errors.namaLengkap" class="invalid-feedback">
+                    {{ errors.namaLengkap }}
+                  </div>
+                </div>
+
+                <!-- Kata Sandi -->
+                <div class="mb-4 position-relative">
+                  <label class="form-label-custom mb-3">Kata Sandi</label>
+                  <input
+                    :type="showPassword ? 'text' : 'password'"
+                    class="form-control custom-input pe-5"
+                    placeholder="Masukkan kata sandi Anda"
+                    v-model="formData.kataSandi"
+                    :class="{ 'is-invalid': errors.kataSandi }"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    @click="togglePassword"
+                  >
+                    <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="toggle-icon"></i>
+                  </button>
+                  <div v-if="errors.kataSandi" class="invalid-feedback">
+                    {{ errors.kataSandi }}
+                  </div>
+                </div>
+
+                <!-- Ulangi Kata Sandi -->
+                <div class="mb-4 position-relative">
+                  <label class="form-label-custom mb-3">Ulangi Kata Sandi</label>
+                  <input
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    class="form-control custom-input pe-5"
+                    placeholder="Masukkan kata sandi Anda"
+                    v-model="formData.ulangiKataSandi"
+                    :class="{ 'is-invalid': errors.ulangiKataSandi }"
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    @click="toggleConfirmPassword"
+                  >
+                    <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'" class="toggle-icon"></i>
+                  </button>
+                  <div v-if="errors.ulangiKataSandi" class="invalid-feedback">
+                    {{ errors.ulangiKataSandi }}
+                  </div>
+                </div>
+
+                <!-- Lupa Kata Sandi Link -->
+                <div class="text-end mb-5">
+                  <a href="#" class="forgot-password-link">
+                    Lupa Kata Sandi?
+                  </a>
+                </div>
+
+                <!-- Daftar Button -->
+                <button
+                  type="submit"
+                  class="btn btn-register w-100 mb-4"
+                  :disabled="isLoading"
+                >
+                  <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                  DAFTAR
+                </button>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                  <span class="login-text">Sudah punya akun? </span>
+                  <a href="#" @click.prevent="goToLogin" class="login-link">
+                    Masuk di sini
+                  </a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -181,66 +121,46 @@ export default {
   name: 'RegisterComponent',
   data() {
     return {
-      registerForm: {
-        fullName: '',
-        username: '',
-        password: '',
-        confirmPassword: ''
+      formData: {
+        namaLengkap: '',
+        kataSandi: '',
+        ulangiKataSandi: ''
       },
+      errors: {},
       showPassword: false,
       showConfirmPassword: false,
-      isLoading: false,
-      errors: {}
+      isLoading: false
     }
   },
   methods: {
     togglePassword() {
       this.showPassword = !this.showPassword;
     },
-    
     toggleConfirmPassword() {
       this.showConfirmPassword = !this.showConfirmPassword;
     },
-    
     validateForm() {
       this.errors = {};
       
-      // Validate full name
-      if (!this.registerForm.fullName.trim()) {
-        this.errors.fullName = 'Nama lengkap wajib diisi';
-      } else if (this.registerForm.fullName.length < 2) {
-        this.errors.fullName = 'Nama lengkap minimal 2 karakter';
+      if (!this.formData.namaLengkap.trim()) {
+        this.errors.namaLengkap = 'Nama lengkap wajib diisi';
       }
       
-      // Validate username
-      if (!this.registerForm.username.trim()) {
-        this.errors.username = 'Username wajib diisi';
-      } else if (this.registerForm.username.length < 3) {
-        this.errors.username = 'Username minimal 3 karakter';
-      } else if (!/^[a-zA-Z0-9_]+$/.test(this.registerForm.username)) {
-        this.errors.username = 'Username hanya boleh berisi huruf, angka, dan underscore';
+      if (!this.formData.kataSandi) {
+        this.errors.kataSandi = 'Kata sandi wajib diisi';
+      } else if (this.formData.kataSandi.length < 6) {
+        this.errors.kataSandi = 'Kata sandi minimal 6 karakter';
       }
       
-      // Validate password
-      if (!this.registerForm.password.trim()) {
-        this.errors.password = 'Kata sandi wajib diisi';
-      } else if (this.registerForm.password.length < 6) {
-        this.errors.password = 'Kata sandi minimal 6 karakter';
-      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(this.registerForm.password)) {
-        this.errors.password = 'Kata sandi harus mengandung huruf besar, huruf kecil, dan angka';
-      }
-      
-      // Validate confirm password
-      if (!this.registerForm.confirmPassword.trim()) {
-        this.errors.confirmPassword = 'Konfirmasi kata sandi wajib diisi';
-      } else if (this.registerForm.password !== this.registerForm.confirmPassword) {
-        this.errors.confirmPassword = 'Konfirmasi kata sandi tidak cocok';
+      if (!this.formData.ulangiKataSandi) {
+        this.errors.ulangiKataSandi = 'Konfirmasi kata sandi wajib diisi';
+      } else if (this.formData.kataSandi !== this.formData.ulangiKataSandi) {
+        this.errors.ulangiKataSandi = 'Kata sandi tidak cocok';
       }
       
       return Object.keys(this.errors).length === 0;
     },
-    
-    async handleRegister() {
+    async handleSubmit() {
       if (!this.validateForm()) {
         return;
       }
@@ -248,475 +168,289 @@ export default {
       this.isLoading = true;
       
       try {
-        // Simulasi API call
+        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Check if username already exists (simulation)
-        const existingUsers = ['admin', 'user', 'test'];
-        if (existingUsers.includes(this.registerForm.username.toLowerCase())) {
-          throw new Error('Username sudah digunakan');
-        }
-        
-        // Emit event ke parent component
+        // Emit event to parent component
         this.$emit('register-success', {
-          fullName: this.registerForm.fullName,
-          username: this.registerForm.username,
-          timestamp: new Date()
+          namaLengkap: this.formData.namaLengkap,
+          kataSandi: this.formData.kataSandi
         });
-        
-        // Reset form
-        this.registerForm = {
-          fullName: '',
-          username: '',
-          password: '',
-          confirmPassword: ''
-        };
         
         // Show success message
-        this.$emit('show-message', {
-          type: 'success',
-          message: 'Pendaftaran berhasil! Silakan login dengan akun Anda.'
-        });
+        alert('Registrasi berhasil!');
         
+        // Reset form
+        this.formData = {
+          namaLengkap: '',
+          kataSandi: '',
+          ulangiKataSandi: ''
+        };
       } catch (error) {
-        this.$emit('show-message', {
-          type: 'error',
-          message: error.message || 'Pendaftaran gagal. Silakan coba lagi.'
-        });
+        alert('Terjadi kesalahan saat registrasi');
       } finally {
         this.isLoading = false;
       }
     },
-    
-    forgotPassword() {
-      this.$emit('forgot-password');
-    },
-    
     goToLogin() {
-      this.$emit('go-to-login');
+      this.$router.push('/login');
+    },
+    goToHome() {
+      this.$router.push('/');
     }
   }
 }
 </script>
 
 <style scoped>
+/* Container Styles */
 .register-container {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
-.illustration-wrapper {
-  position: relative;
+.image-wrapper {
   width: 100%;
   max-width: 500px;
-  height: 400px;
-}
-
-.illustration {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-/* Phone Mockup */
-.phone-mockup {
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  width: 180px;
-  height: 300px;
-  background: #2c3e50;
-  border-radius: 25px;
-  padding: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  z-index: 3;
-}
-
-.phone-screen {
-  width: 100%;
-  height: 100%;
-  background: white;
-  border-radius: 15px;
-  padding: 20px 15px;
-  position: relative;
-}
-
-.app-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.app-icon {
-  width: 30px;
-  height: 30px;
-  background: #e74c3c;
-  border-radius: 8px;
-  margin-right: 10px;
-}
-
-.app-lines {
-  flex: 1;
-}
-
-.line {
-  height: 4px;
-  background: #ecf0f1;
-  border-radius: 2px;
-  margin-bottom: 5px;
-}
-
-.line-1 {
-  width: 80%;
-}
-
-.line-2 {
-  width: 60%;
-}
-
-.form-preview {
-  margin-bottom: 20px;
-}
-
-.input-line {
-  height: 8px;
-  background: #ecf0f1;
-  border-radius: 4px;
-  margin-bottom: 15px;
-}
-
-.input-line.short {
-  width: 70%;
-}
-
-.dots {
-  font-size: 12px;
-  color: #bdc3c7;
-  margin-bottom: 20px;
-}
-
-.signup-btn {
-  background: #e74c3c;
-  color: white;
-  text-align: center;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-/* Character */
-.character {
-  position: absolute;
-  bottom: 0;
-  left: 50px;
-  z-index: 2;
-}
-
-.character-head {
-  width: 60px;
-  height: 60px;
-  background: #f4d1ae;
-  border-radius: 50%;
-  position: relative;
-  margin-bottom: -10px;
-}
-
-.character-body {
-  width: 80px;
-  height: 120px;
-  background: #e74c3c;
-  border-radius: 40px 40px 20px 20px;
-}
-
-.character-arm {
-  position: absolute;
-  width: 15px;
-  height: 80px;
-  background: #f4d1ae;
-  border-radius: 10px;
-  right: -5px;
-  top: 70px;
-  transform: rotate(-20deg);
-}
-
-.character-legs {
-  position: absolute;
-  bottom: -60px;
-  left: 10px;
-  width: 60px;
-  height: 60px;
-  background: #2c3e50;
-  border-radius: 30px 30px 0 0;
-}
-
-/* Security Lock */
-.security-lock {
-  position: absolute;
-  top: 50px;
-  left: 100px;
-  width: 40px;
-  height: 50px;
-  z-index: 4;
-}
-
-.lock-body {
-  width: 40px;
-  height: 30px;
-  background: #e74c3c;
-  border-radius: 5px;
-  position: relative;
-  margin-top: 15px;
-}
-
-.lock-shackle {
-  width: 25px;
-  height: 20px;
-  border: 4px solid #e74c3c;
-  border-bottom: none;
-  border-radius: 15px 15px 0 0;
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.lock-keyhole {
-  width: 6px;
-  height: 6px;
-  background: white;
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Floating Elements */
-.floating-elements {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.float-element {
-  position: absolute;
-  border-radius: 10px;
-  opacity: 0.3;
-}
-
-.element-1 {
-  width: 20px;
-  height: 20px;
-  background: #3498db;
-  top: 30px;
-  left: 30px;
-  animation: float 3s ease-in-out infinite;
-}
-
-.element-2 {
-  width: 15px;
-  height: 15px;
-  background: #f39c12;
-  top: 150px;
-  right: 80px;
-  animation: float 3s ease-in-out infinite 1s;
-}
-
-.element-3 {
-  width: 25px;
-  height: 25px;
-  background: #2ecc71;
-  bottom: 80px;
-  left: 20px;
-  animation: float 3s ease-in-out infinite 2s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-/* Form Styles */
-.register-form-wrapper {
-  max-width: 450px;
-  margin: 0 auto;
   padding: 2rem;
 }
 
-.card {
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+.registration-image {
+  width: 100%;
+  height: auto;
+  animation: fadeInUp 0.8s ease-out;
 }
 
-.register-title {
+/* Form Container */
+.form-wrapper {
+  padding: 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-container {
+  background: #FEBFBF;
+  padding: 40px 30px;
+  border-radius: 25px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+/* Typography */
+.form-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
+  color: #000000;
+  margin-bottom: 8px;
 }
 
-.welcome-text {
-  color: #e74c3c;
-  font-size: 1.1rem;
-  margin-bottom: 0;
-}
-
-.form-label {
-  color: #2c3e50;
-  margin-bottom: 0.75rem;
-}
-
-.custom-input {
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
+.form-subtitle {
   font-size: 1rem;
+  color: #dc2626;
+  font-weight: 400;
+}
+
+.form-label-custom {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+  display: block;
+}
+
+/* Input Styles */
+.custom-input {
+  border: none;
+  background: #f5f5f5;
+  border-radius: 15px;
+  padding: 18px 20px;
+  font-size: 16px;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+  color: #666666;
+  width: 100%;
+}
+
+.custom-input::placeholder {
+  color: #999999;
+  font-weight: 400;
 }
 
 .custom-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-  background: #fff;
+  background: #f0f0f0;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  border: 2px solid #dc2626;
 }
 
 .custom-input.is-invalid {
-  border-color: #dc3545;
+  border: 2px solid #dc2626;
+  background: #fef2f2;
 }
 
+/* Password Toggle */
 .password-toggle {
-  border: 2px solid #e9ecef;
-  border-left: none;
-  border-radius: 0 12px 12px 0;
-  background: rgba(255, 255, 255, 0.9);
-  transition: all 0.3s ease;
-}
-
-.password-toggle:hover {
-  background: #f8f9fa;
-  border-color: #667eea;
-}
-
-.register-btn {
-  background: linear-gradient(45deg, #667eea, #764ba2);
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
   border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  padding: 0.75rem 2rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  cursor: pointer;
+  padding: 8px;
+  z-index: 5;
 }
 
-.register-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(45deg, #5a6fd8, #6a42a6);
+.toggle-icon {
+  color: #dc2626;
+  font-size: 18px;
 }
 
-.register-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.forgot-link {
-  color: #e74c3c;
+/* Forgot Password Link */
+.forgot-password-link {
+  color: #dc2626;
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.3s ease;
+  font-weight: 500;
 }
 
-.forgot-link:hover {
-  color: #c0392b;
+.forgot-password-link:hover {
+  color: #b91c1c;
   text-decoration: underline;
+}
+
+/* Register Button */
+.btn-register {
+  background: #9ca3af;
+  border: none;
+  border-radius: 15px;
+  padding: 18px 24px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  color: white;
+  text-transform: uppercase;
+}
+
+.btn-register:hover:not(:disabled) {
+  background: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(156, 163, 175, 0.3);
+  color: white;
+}
+
+.btn-register:disabled {
+  background: #d1d5db;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Login Link */
+.login-text {
+  color: #666666;
+  font-size: 0.9rem;
 }
 
 .login-link {
-  color: #667eea;
+  color: #000000;
+  font-weight: 700;
   text-decoration: none;
-  transition: color 0.3s ease;
+  font-size: 0.9rem;
 }
 
 .login-link:hover {
-  color: #5a6fd8;
+  color: #dc2626;
   text-decoration: underline;
 }
 
+/* Back Button */
+.btn-back {
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 8px 18px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 10;
+}
+
+.btn-back:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Error Messages */
 .invalid-feedback {
+  color: #dc2626;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: 8px;
+  font-weight: 500;
 }
 
 /* Responsive Design */
-@media (max-width: 991px) {
-  .register-form-wrapper {
-    padding: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .card-body {
-    padding: 2rem !important;
+@media (max-width: 991.98px) {
+  .col-lg-6:first-child {
+    display: none;
   }
   
-  .register-title {
-    font-size: 2rem;
+  .form-wrapper {
+    padding: 1.5rem;
   }
   
-  .welcome-text {
-    font-size: 1rem;
+  .form-container {
+    padding: 30px 25px;
   }
 }
 
 @media (max-width: 576px) {
-  .card-body {
-    padding: 1.5rem !important;
+  .form-wrapper {
+    padding: 1rem;
   }
   
-  .register-title {
-    font-size: 1.75rem;
+  .form-container {
+    padding: 25px 20px;
+    border-radius: 20px;
+    margin: 1rem;
+  }
+  
+  .form-title {
+    font-size: 2rem;
   }
   
   .custom-input {
-    font-size: 0.9rem;
+    padding: 16px 18px;
+    font-size: 15px;
+  }
+  
+  .btn-register {
+    padding: 16px 20px;
+    font-size: 15px;
   }
 }
 
-/* Animation */
-.register-form-wrapper {
-  animation: slideInRight 0.6s ease-out;
-}
-
-.illustration {
-  animation: slideInLeft 0.6s ease-out;
-}
-
-@keyframes slideInRight {
+/* Animations */
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.form-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.registration-image {
+  animation: fadeInUp 0.8s ease-out;
 }
 </style>

@@ -3,6 +3,10 @@ import Login from '../pages/Login.vue'
 import Daftar from '../pages/Daftar.vue'
 import Home from '../pages/Home.vue'
 import Userlayout from '../Layouts/UserLayout.vue'
+import RegisterForm from '../components/RegisterForm.vue'
+import SuccessModal from '../components/SuccessModal.vue'
+import History from '../components/History.vue'
+import Sidebar from '../pages/admin/Sidebar.vue'
 
 const routes = [
   {
@@ -16,6 +20,26 @@ const routes = [
     component: Daftar
   },
   {
+    path: '/RegisterForm',
+    name: 'RegisterForm',
+    component: RegisterForm
+  },
+  {
+    path: '/success',
+    name: 'SuccessModal',
+    component: SuccessModal
+  },
+  {
+    path: '/status',
+    name: 'StatusPengajuan',
+    component: History
+  },
+  {
+    path: '/history',
+    name: 'History',
+    component: History
+  },
+  { 
     path: '/',
     component: Userlayout,
     children: [
