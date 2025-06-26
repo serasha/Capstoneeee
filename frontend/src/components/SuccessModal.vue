@@ -1,104 +1,94 @@
 <template>
   <div v-if="visible" class="modal-overlay" @click.self="closeModal">
     <div class="success-container modal-popup">
-      <div class="container-fluid">
-        <div class="row min-vh-100">
-          <div class="col-12 d-flex align-items-center justify-content-center">
-            <div class="success-wrapper">
-              <!-- Close Button -->
-              <button class="modal-close-btn" @click="closeModal" aria-label="Close">&times;</button>
-              
-              <!-- Success Card -->
-              <div class="success-card">
-                <!-- Animated Check Icon -->
-                <div class="check-icon-wrapper">
-                  <div class="check-circle">
-                    <div class="check-icon">
-                      <svg class="checkmark" viewBox="0 0 52 52">
-                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Success Message -->
-                <div class="success-content">
-                  <h2 class="success-title" v-if="!showAnimation">
-                    {{ successTitle }}
-                  </h2>
-                  <h2 class="success-title animate__animated animate__fadeInUp" v-else>
-                    {{ successTitle }}
-                  </h2>
-                  
-                  <p class="success-subtitle" v-if="userData">
-                    Selamat datang, <strong>{{ userData.fullName }}</strong>!
-                  </p>
-                  <p class="success-subtitle" v-else>
-                    Akun Anda telah berhasil dibuat dan siap digunakan.
-                  </p>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="success-actions">
-                  <button 
-                    class="btn btn-status"
-                    @click="viewApplicationStatus"
-                    :disabled="isLoading"
-                  >
-                    <span v-if="!isLoading">Lihat Status Pengajuan</span>
-                    <span v-else>
-                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                      Loading...
-                    </span>
-                  </button>
-                  
-                  <div class="secondary-actions mt-3">
-                    <button 
-                      class="btn btn-outline-primary me-2"
-                      @click="goToDashboard"
-                    >
-                      <i class="fas fa-tachometer-alt me-2"></i>
-                      Dashboard
-                    </button>
-                    
-                    <button 
-                      class="btn btn-outline-secondary"
-                      @click="goToHome"
-                    >
-                      <i class="fas fa-home me-2"></i>
-                      Beranda
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Additional Info -->
-                <div class="additional-info">
-                  <div class="info-item">
-                    <i class="fas fa-envelope text-primary"></i>
-                    <span>Email konfirmasi telah dikirim</span>
-                  </div>
-                  <div class="info-item">
-                    <i class="fas fa-shield-alt text-success"></i>
-                    <span>Akun Anda aman dan terverifikasi</span>
+      <div class="row min-vh-100">
+        <div class="col-12 d-flex align-items-center justify-content-center">
+          <div class="success-wrapper">
+            <!-- Close Button -->
+            <button class="modal-close-btn" @click="closeModal" aria-label="Close">&times;</button>
+            
+            <!-- Success Card -->
+            <div class="success-card">
+              <!-- Animated Check Icon -->
+              <div class="check-icon-wrapper">
+                <div class="check-circle">
+                  <div class="check-icon">
+                    <svg class="checkmark" viewBox="0 0 52 52">
+                      <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                      <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
                   </div>
                 </div>
               </div>
 
-              <!-- Floating Elements -->
-              <div class="floating-elements">
-                <div class="float-element element-1">
-                  <i class="fas fa-star"></i>
+              <!-- Success Message -->
+              <div class="success-content">
+                <h2 class="success-title" v-if="!showAnimation">
+                  {{ successTitle }}
+                </h2>
+                <h2 class="success-title animate__animated animate__fadeInUp" v-else>
+                  {{ successTitle }}
+                </h2>
+                
+                <p class="success-subtitle" v-if="userData">
+                  Selamat datang, <strong>{{ userData.fullName }}</strong>!
+                </p>
+                <p class="success-subtitle" v-else>
+                  Akun Anda telah berhasil dibuat dan siap digunakan.
+                </p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="success-actions">
+                <button 
+                  class="btn btn-status"
+                  @click="viewApplicationStatus"
+                  :disabled="isLoading"
+                >
+                  <span v-if="!isLoading">Lihat Status Pengajuan</span>
+                  <span v-else>
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Loading...
+                  </span>
+                </button>
+                
+                <div class="secondary-actions mt-3">
+                  <button 
+                    class="btn btn-outline-secondary"
+                    @click="goToHome"
+                  >
+                    <i class="fas fa-home me-2"></i>
+                    Beranda
+                  </button>
                 </div>
-                <div class="float-element element-2">
-                  <i class="fas fa-heart"></i>
+              </div>
+
+              <!-- Additional Info -->
+              <div class="additional-info">
+                <div class="info-item">
+                  <i class="fas fa-envelope text-primary"></i>
+                  <span>Email konfirmasi telah dikirim</span>
                 </div>
-                <div class="float-element element-3">
-                  <i class="fas fa-thumbs-up"></i>
+                <div class="info-item">
+                  <i class="fas fa-shield-alt text-success"></i>
+                  <span>Akun Anda aman dan terverifikasi</span>
                 </div>
-                <div class="float-element element-4">
-                  <i class="fas fa-trophy"></i>
-                </div>
+              </div>
+            </div>
+
+            <!-- Floating Elements -->
+            <div class="floating-elements">
+              <div class="float-element element-1">
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="float-element element-2">
+                <i class="fas fa-heart"></i>
+              </div>
+              <div class="float-element element-3">
+                <i class="fas fa-thumbs-up"></i>
+              </div>
+              <div class="float-element element-4">
+                <i class="fas fa-trophy"></i>
               </div>
             </div>
           </div>
@@ -147,12 +137,6 @@ export default {
         // You can redirect or show status modal here
         console.log('Viewing application status...');
       }, 2000);
-    },
-    
-    goToDashboard() {
-      this.$emit('go-to-dashboard');
-      // Handle navigation to dashboard
-      console.log('Navigating to dashboard...');
     },
     
     goToHome() {
