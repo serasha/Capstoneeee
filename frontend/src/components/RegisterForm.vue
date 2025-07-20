@@ -46,8 +46,6 @@
               class="form-control custom-input" 
               v-model="formData.nik"
               required
-              inputmode="numeric"
-              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-6">
@@ -78,8 +76,6 @@
               class="form-control custom-input" 
               v-model="formData.nomorKK"
               required
-              inputmode="numeric"
-              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-6">
@@ -139,8 +135,6 @@
               class="form-control custom-input" 
               v-model="formData.nomorTelepon"
               required
-              inputmode="numeric"
-              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-6">
@@ -159,8 +153,6 @@
               class="form-control custom-input" 
               v-model="formData.jumlahAnggota"
               required
-              inputmode="numeric"
-              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-4">
@@ -170,8 +162,6 @@
               class="form-control custom-input" 
               v-model="formData.kodePos"
               required
-              inputmode="numeric"
-              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-4">
@@ -302,8 +292,6 @@
               class="form-control custom-input" 
               v-model="formData.nomorPendaftaran"
               required
-              inputmode="numeric"
-              pattern="[0-9]*"
             >
           </div>
         </div>
@@ -329,7 +317,7 @@
 
     <SuccessModal
       :visible="showSuccessModal"
-       :userData="{ fullName: loggedInUserName || formData.namaKepalaKeluarga }"
+      :userData="{ fullName: formData.namaKepalaKeluarga }"
       @close="showSuccessModal = false"
       @view-status="goToStatus"
       @go-to-dashboard="goToDashboard"
@@ -349,6 +337,9 @@ export default {
       isSubmitting: false,
       uploadedFiles: [],
       showSuccessModal: false,
+      user: null,
+      errorMsg: '',
+      fieldErrors: {},
       formData: {
         namaKepalaKeluarga: '',
         jenisKelamin: '',
@@ -375,6 +366,19 @@ export default {
       }
     }
   },
+  async created() {
+    // Cek login
+    try {
+      const res = await fetch('/api/user/me', { credentials: 'include' });
+      if (res.ok) {
+        this.user = await res.json();
+      } else {
+        this.$router.push('/login');
+      }
+    } catch {
+      this.$router.push('/login');
+    }
+  },
   methods: {
     goBack() {
       this.$router.go(-1);
@@ -398,15 +402,39 @@ export default {
       this.errorMsg = '';
       this.fieldErrors = {};
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Handle form submission
-        console.log('Form Data:', this.formData);
-        console.log('Uploaded Files:', this.uploadedFiles);
-        
-        this.showSuccessModal = true; // Tampilkan modal setelah submit sukses
-        
+        // Kirim data ke backend (hanya field yang perlu diisi user)
+        const response = await fetch('/api/pendaftaran', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            nama_pendaftar: this.formData.namaKepalaKeluarga,
+            alamat_pendaftar: this.formData.namaJalan,
+            jenis_layanan: this.formData.pilihan,
+            cara_pendaftar: 'online',
+            dokumen_administrasi_pendaftar: '', // handle upload terpisah jika perlu
+          }),
+        });
+        if (!response.ok) {
+          let errorData = {};
+          try {
+            errorData = await response.json();
+          } catch (e) {
+            errorData = { error: 'Gagal mendaftar' };
+          }
+          if (errorData.errors) {
+            this.fieldErrors = errorData.errors;
+            this.errorMsg = '';
+          } else {
+            this.errorMsg = errorData.error || 'Gagal mendaftar';
+          }
+          throw new Error(this.errorMsg || 'Validasi error');
+        }
+        // Jika sukses
+        alert('Pendaftaran berhasil! Status: pending.');
+        this.showSuccessModal = true;
       } catch (error) {
         // errorMsg dan fieldErrors sudah di-set
       } finally {

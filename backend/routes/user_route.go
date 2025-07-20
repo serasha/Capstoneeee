@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
+	"strconv"
 )
 
 var jwtSecret = []byte("supersecretkey")
@@ -107,9 +108,13 @@ func SetupUserRoutes(route fiber.Router) {
 			})
 		}
 
-		// Buat data masyarakat otomatis
+		// Buat data masyarakat otomatis dengan NIK dan Email unik
+		nikAuto := "AUTO-" + strconv.Itoa(int(user.ID))
+		emailAuto := user.Username + "+auto@yourapp.local"
 		masyarakat := models.Masyarakat{
 			NamaLengkap: req.NamaLengkap,
+			NIK: nikAuto,
+			Email: emailAuto,
 			Password: string(hashedPassword),
 			TglPendaftaran: time.Now(),
 		}

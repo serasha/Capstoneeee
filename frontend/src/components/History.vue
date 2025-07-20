@@ -109,14 +109,14 @@ export default {
       const res = await fetch('/api/pendaftaran/user', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
-        this.statusData = data.map(item => ({
-          tanggalPengajuan: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
-          nama: item.nama_pendaftar || '-',
-          kotaAsal: item.alamat_pendaftar || '-',
-          tujuanTransmigrasi: item.jenis_layanan || '-',
-          nomorRegistrasi: item.id_pendaftaran || '-',
-          status: item.status_pendaftar || '-'
-        }));
+        this.statusData = Array.isArray(data) ? data.map(item => ({
+          tanggalPengajuan: item && item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
+          nama: item && typeof item === 'object' && 'nama_pendaftar' in item && item.nama_pendaftar ? item.nama_pendaftar : '-',
+          kotaAsal: item && typeof item === 'object' && 'alamat_pendaftar' in item && item.alamat_pendaftar ? item.alamat_pendaftar : '-',
+          tujuanTransmigrasi: item && typeof item === 'object' && 'jenis_layanan' in item && item.jenis_layanan ? item.jenis_layanan : '-',
+          nomorRegistrasi: item && typeof item === 'object' && ('id_pendaftaran' in item || 'id' in item) ? (item.id_pendaftaran || item.id) : '-',
+          status: item && typeof item === 'object' && 'status_pendaftar' in item && item.status_pendaftar ? item.status_pendaftar : '-'
+        })) : [];
       } else {
         this.errorMsg = 'Gagal mengambil data status pendaftaran';
       }
@@ -124,7 +124,6 @@ export default {
       this.errorMsg = 'Gagal mengambil data status pendaftaran';
     } finally {
       this.loading = false;
-      statusData: []
     }
   },
   mounted() {
