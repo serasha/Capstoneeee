@@ -29,13 +29,20 @@
 
       <!-- Right side buttons -->
       <div class="d-flex gap-2 mb-0 me-4 daftar-masuk-group">
-        <router-link to="/daftar" class="btn btn-outline-warning daftar-btn">
-          Daftar
-        </router-link>
-        <router-link to="/login" class="btn btn-warning masuk-btn">
-          Masuk
-        </router-link>
-       
+        <template v-if="!loading">
+          <template v-if="user">
+            <span class="text-white me-2">👤 {{ user.username }}</span>
+            <button class="btn btn-outline-light" @click="logout">Logout</button>
+          </template>
+          <template v-else>
+            <router-link to="/daftar" class="btn btn-outline-warning daftar-btn">
+              Daftar
+            </router-link>
+            <router-link to="/login" class="btn btn-warning masuk-btn">
+              Masuk
+            </router-link>
+          </template>
+        </template>
       </div>
     </div>
   </nav>
@@ -46,11 +53,34 @@ export default {
   name: 'Navbar',
   data() {
     return {
-      // Anda bisa menambahkan data reactive di sini jika diperlukan
+      user: null,
+      loading: true
     }
   },
+  created() {
+    this.checkAuth();
+  },
   methods: {
-    // Anda bisa menambahkan methods di sini jika diperlukan
+    async checkAuth() {
+      try {
+        const res = await fetch('/api/user/me', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          this.user = data;
+        } else {
+          this.user = null;
+        }
+      } catch {
+        this.user = null;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async logout() {
+      await fetch('/api/user/logout', { method: 'POST', credentials: 'include' });
+      this.user = null;
+      this.$router.push('/login');
+    }
   }
 }
 </script>

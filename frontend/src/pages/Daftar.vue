@@ -24,9 +24,9 @@
               </div>
 
               <form @submit.prevent="handleSubmit">
-                <!-- Nama Lengkap -->
+                <!-- Username -->
                 <div class="mb-4">
-                  <label class="form-label-custom mb-3">Nama Lengkap</label>
+                  <label class="form-label-custom mb-3">Username</label>
                   <input
                     type="text"
                     class="form-control custom-input"
@@ -35,7 +35,7 @@
                     :class="{ 'is-invalid': errors.namaLengkap }"
                   />
                   <div v-if="errors.namaLengkap" class="invalid-feedback">
-                    {{ errors.namaLengkap }}
+                    {{ errors.namaLengkap ? errors.namaLengkap.replace('Nama lengkap', 'Username') : '' }}
                   </div>
                 </div>
 
@@ -143,7 +143,7 @@ export default {
       this.errors = {};
       
       if (!this.formData.namaLengkap.trim()) {
-        this.errors.namaLengkap = 'Nama lengkap wajib diisi';
+        this.errors.namaLengkap = 'Username wajib diisi';
       }
       
       if (!this.formData.kataSandi) {
@@ -164,30 +164,30 @@ export default {
       if (!this.validateForm()) {
         return;
       }
-      
       this.isLoading = true;
-      
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Emit event to parent component
-        this.$emit('register-success', {
-          namaLengkap: this.formData.namaLengkap,
-          kataSandi: this.formData.kataSandi
+        const response = await fetch('/api/user/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            namaLengkap: this.formData.namaLengkap,
+            kataSandi: this.formData.kataSandi
+          }),
         });
-        
-        // Show success message
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Gagal registrasi');
+        }
         alert('Registrasi berhasil!');
-        
-        // Reset form
         this.formData = {
           namaLengkap: '',
           kataSandi: '',
           ulangiKataSandi: ''
         };
       } catch (error) {
-        alert('Terjadi kesalahan saat registrasi');
+        alert(error.message || 'Terjadi kesalahan saat registrasi');
       } finally {
         this.isLoading = false;
       }

@@ -129,23 +129,32 @@ export default {
       if (!this.validateForm()) {
         return;
       }
-      
       this.isLoading = true;
-      
       try {
-        // Simulasi API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Emit event atau redirect setelah login berhasil
-        this.$emit('login-success', this.loginData);
-        
-        // Reset form
+        const response = await fetch('/api/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            namaLengkap: this.loginData.username,
+            kataSandi: this.loginData.password
+          }),
+          credentials: 'include'
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Gagal login');
+        }
+        const data = await response.json();
+        this.$emit('login-success', data.user);
         this.loginData = { username: '', password: '' };
-        
-        console.log('Login berhasil:', this.loginData);
+        // Redirect ke dashboard/home
+        this.$router.push('/');
+        // Trigger reload Navbar
+        this.$root.$emit && this.$root.$emit('auth-changed');
       } catch (error) {
-        console.error('Login gagal:', error);
-        // Handle error
+        alert(error.message || 'Login gagal');
       } finally {
         this.isLoading = false;
       }

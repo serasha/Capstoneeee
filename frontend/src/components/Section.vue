@@ -10,39 +10,44 @@
         
         <!-- Service Cards -->
         <div class="row justify-content-center g-4 mb-5">
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToFormulir">
-              <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
-                <span class="service-icon" style="font-size:2.5rem;">📝</span>
+          <template v-if="!loading">
+            <template v-if="user">
+              <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToFormulir">
+                  <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                    <span class="service-icon" style="font-size:2.5rem;">📝</span>
+                  </div>
+                  <div class="service-title text-center">
+                    <div class="title-line">Pendaftaran</div>
+                    <div class="title-line">Formulir</div>
+                  </div>
+                </div>
               </div>
-              <div class="service-title text-center">
-                <div class="title-line">Pendaftaran</div>
-                <div class="title-line">Formulir</div>
+              <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToStatus">
+                  <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                    <span class="service-icon" style="font-size:2.5rem;">📊</span>
+                  </div>
+                  <div class="service-title text-center">
+                    <div class="title-line">Pantau Status</div>
+                    <div class="title-line">Pengajuan</div>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- Bantuan & Konsultasi selalu muncul -->
+            <div class="col-lg-3 col-md-4 col-sm-6">
+              <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToBantuan">
+                <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                  <span class="service-icon" style="font-size:2.5rem;">💬</span>
+                </div>
+                <div class="service-title text-center">
+                  <div class="title-line">Bantuan &</div>
+                  <div class="title-line">Konsultasi</div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToStatus">
-              <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
-                <span class="service-icon" style="font-size:2.5rem;">📊</span>
-              </div>
-              <div class="service-title text-center">
-                <div class="title-line">Pantau Status</div>
-                <div class="title-line">Pengajuan</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToBantuan">
-              <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
-                <span class="service-icon" style="font-size:2.5rem;">💬</span>
-              </div>
-              <div class="service-title text-center">
-                <div class="title-line">Bantuan &</div>
-                <div class="title-line">Konsultasi</div>
-              </div>
-            </div>
-          </div>
+          </template>
         </div>
       </div>
     </section>
@@ -143,8 +148,25 @@
 <script>
 export default {
   name: 'LayananTransmigrasi',
-  mounted() {
-    // Add any initialization logic here if needed
+  data() {
+    return {
+      user: null,
+      loading: true
+    }
+  },
+  async created() {
+    try {
+      const res = await fetch('/api/user/me', { credentials: 'include' });
+      if (res.ok) {
+        this.user = await res.json();
+      } else {
+        this.user = null;
+      }
+    } catch {
+      this.user = null;
+    } finally {
+      this.loading = false;
+    }
   },
   methods: {
     goToFormulir() {

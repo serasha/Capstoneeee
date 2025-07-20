@@ -8,12 +8,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/session"
 	"gorm.io/gorm"
 
 	"my-app/backend/database"
 	"my-app/backend/models"
 	"my-app/backend/routes"
 )
+
+var store = session.New()
 
 type App struct {
 	DB *gorm.DB
@@ -31,6 +34,7 @@ func main() {
 		&models.Masyarakat{},
 		&models.Admin{},
 		&models.SuperAdmin{},
+		&models.User{},
 	)
 	log.Println("Dropping old tables...")
 
@@ -43,6 +47,7 @@ func main() {
 		&models.Mengelola{},
 		&models.Dikelola{},
 		&models.SuperAdmin{},
+		&models.User{},
 	)
 	if err != nil {
 		log.Fatal("Migrasi gagal:", err)
@@ -63,6 +68,8 @@ func main() {
 	api := app.Group("/api") // grup semua route API
 	routes.SetupLoginRoutes(api)
 	routes.SetupDaftarRoutes(api)
+	routes.SetupUserRoutes(api)
+	routes.PendaftaranRoutes(api, database.DB)
 
 	// 📦 Serve static files (Vue build result)
 	app.Static("/", "../frontend/dist")

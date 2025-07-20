@@ -5,10 +5,9 @@ import (
 )
 
 type User struct {
-	ID        uint   `json:"id" gorm:"primaryKey"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	CreatedAt string `json:"created_at"`
+	ID       uint   `json:"id" gorm:"primaryKey"`
+	Username string `json:"username" gorm:"unique"`
+	Password string `json:"password"`
 }
 
 func GetAllUsers(db *gorm.DB) ([]User, error) {

@@ -5,11 +5,13 @@ import (
 	"gorm.io/gorm"
 
 	"my-app/backend/handlers"
+	"my-app/backend/middleware"
 )
 
-func PendaftaranRoutes(app *fiber.App, db *gorm.DB) {
-	app.Get("/api/pendaftaran", handlers.GetAllPendaftaran(db))
-	app.Post("/api/pendaftaran", handlers.CreatePendaftaran(db))
-	app.Put("/api/pendaftaran/:id", handlers.UpdatePendaftaran(db))
-	app.Delete("/api/pendaftaran/:id", handlers.DeletePendaftaran(db))
+func PendaftaranRoutes(router fiber.Router, db *gorm.DB) {
+	router.Get("/pendaftaran", handlers.GetAllPendaftaran(db))
+	router.Get("/pendaftaran/user", middleware.AuthRequired, handlers.GetPendaftaranByUser(db))
+	router.Post("/pendaftaran", middleware.AuthRequired, handlers.CreatePendaftaran(db))
+	router.Put("/pendaftaran/:id", handlers.UpdatePendaftaran(db))
+	router.Delete("/pendaftaran/:id", handlers.DeletePendaftaran(db))
 }

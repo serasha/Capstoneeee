@@ -9,6 +9,7 @@
     </div>
 
     <form @submit.prevent="submitForm" class="registration-form">
+      <div v-if="errorMsg" class="alert alert-danger mb-3">{{ errorMsg }}</div>
       <!-- Data Pribadi & Keluarga Section -->
       <div class="form-section mb-4">
         <div class="section-header">
@@ -23,8 +24,11 @@
               type="text" 
               class="form-control custom-input" 
               v-model="formData.namaKepalaKeluarga"
+              ref="namaKepalaKeluarga"
               required
+              :class="{ 'is-invalid': fieldErrors.nama_pendaftar }"
             >
+            <div v-if="fieldErrors.nama_pendaftar" class="invalid-feedback d-block">{{ fieldErrors.nama_pendaftar }}</div>
           </div>
           <div class="col-md-6">
             <label class="form-label required">Jenis Kelamin</label>
@@ -118,8 +122,11 @@
               type="text" 
               class="form-control custom-input" 
               v-model="formData.namaJalan"
+              ref="namaJalan"
               required
+              :class="{ 'is-invalid': fieldErrors.alamat_pendaftar }"
             >
+            <div v-if="fieldErrors.alamat_pendaftar" class="invalid-feedback d-block">{{ fieldErrors.alamat_pendaftar }}</div>
           </div>
           <div class="col-md-6">
             <label class="form-label required">Nomor Telepon</label>
@@ -330,6 +337,9 @@ export default {
       isSubmitting: false,
       uploadedFiles: [],
       showSuccessModal: false,
+      user: null,
+      errorMsg: '',
+      fieldErrors: {},
       formData: {
         namaKepalaKeluarga: '',
         jenisKelamin: '',
@@ -356,6 +366,19 @@ export default {
       }
     }
   },
+  async created() {
+    // Cek login
+    try {
+      const res = await fetch('/api/user/me', { credentials: 'include' });
+      if (res.ok) {
+        this.user = await res.json();
+      } else {
+        this.$router.push('/login');
+      }
+    } catch {
+      this.$router.push('/login');
+    }
+  },
   methods: {
     goBack() {
       this.$router.go(-1);
@@ -376,20 +399,44 @@ export default {
     },
     async submitForm() {
       this.isSubmitting = true;
-      
+      this.errorMsg = '';
+      this.fieldErrors = {};
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Handle form submission
-        console.log('Form Data:', this.formData);
-        console.log('Uploaded Files:', this.uploadedFiles);
-        
-        this.showSuccessModal = true; // Tampilkan modal setelah submit sukses
-        
+        // Kirim data ke backend (hanya field yang perlu diisi user)
+        const response = await fetch('/api/pendaftaran', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            nama_pendaftar: this.formData.namaKepalaKeluarga,
+            alamat_pendaftar: this.formData.namaJalan,
+            jenis_layanan: this.formData.pilihan,
+            cara_pendaftar: 'online',
+            dokumen_administrasi_pendaftar: '', // handle upload terpisah jika perlu
+          }),
+        });
+        if (!response.ok) {
+          let errorData = {};
+          try {
+            errorData = await response.json();
+          } catch (e) {
+            errorData = { error: 'Gagal mendaftar' };
+          }
+          if (errorData.errors) {
+            this.fieldErrors = errorData.errors;
+            this.errorMsg = '';
+          } else {
+            this.errorMsg = errorData.error || 'Gagal mendaftar';
+          }
+          throw new Error(this.errorMsg || 'Validasi error');
+        }
+        // Jika sukses
+        alert('Pendaftaran berhasil! Status: pending.');
+        this.showSuccessModal = true;
       } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('Terjadi kesalahan saat mengirim pendaftaran.');
+        // errorMsg dan fieldErrors sudah di-set
       } finally {
         this.isSubmitting = false;
       }

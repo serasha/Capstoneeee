@@ -76,13 +76,14 @@
     </div>
 
     <!-- Empty State (jika tidak ada data) -->
-    <div v-if="statusData.length === 0" class="empty-state text-center py-5">
+    <div v-if="!loading && statusData.length === 0" class="empty-state text-center py-5">
       <div class="mb-4">
         <i class="fas fa-file-alt fa-3x text-muted"></i>
       </div>
       <h5 class="text-muted">Belum ada pengajuan</h5>
       <p class="text-muted">Data pengajuan transmigrasi akan muncul di sini</p>
     </div>
+    <div v-if="errorMsg" class="alert alert-danger mt-3">{{ errorMsg }}</div>
   </div>
 </template>
 
@@ -91,33 +92,39 @@ export default {
   name: 'StatusPengajuan',
   data() {
     return {
-      statusData: [
-        {
-          tanggalPengajuan: '12/05/2025',
-          nama: 'HENDRAWAN SUJATMIKO, S.T.',
-          kotaAsal: 'Banyuwangi',
-          tujuanTransmigrasi: 'Kota Palu',
-          nomorRegistrasi: '2025/1/03/CATRANS/YK',
-          status: 'Proses'
-        },
-        {
-          tanggalPengajuan: '12/05/2025',
-          nama: 'HENDRAWAN SUJATMIKO, S.T.',
-          kotaAsal: 'Banyuwangi',
-          tujuanTransmigrasi: 'Kota Palu',
-          nomorRegistrasi: '2025/1/03/CATRANS/YK',
-          status: 'Selesai'
-        }
-      ]
+      statusData: [],
+      loading: true,
+      errorMsg: ''
+    }
+  },
+  async created() {
+    try {
+      const res = await fetch('/api/pendaftaran/user', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        this.statusData = data.map(item => ({
+          tanggalPengajuan: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
+          nama: item.nama_pendaftar || '-',
+          kotaAsal: item.alamat_pendaftar || '-',
+          tujuanTransmigrasi: item.jenis_layanan || '-',
+          nomorRegistrasi: item.id_pendaftaran || '-',
+          status: item.status_pendaftar || '-'
+        }));
+      } else {
+        this.errorMsg = 'Gagal mengambil data status pendaftaran';
+      }
+    } catch (e) {
+      this.errorMsg = 'Gagal mengambil data status pendaftaran';
+    } finally {
+      this.loading = false;
     }
   },
   methods: {
     goBack() {
-      // Implementasi untuk kembali ke halaman sebelumnya
       this.$router.go(-1);
     },
     getStatusClass(status) {
-      switch(status.toLowerCase()) {
+      switch((status||'').toLowerCase()) {
         case 'proses':
           return 'bg-warning text-dark';
         case 'selesai':
