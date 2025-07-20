@@ -153,6 +153,23 @@ export default {
         this.$router.push('/');
         // Trigger reload Navbar
         this.$root.$emit && this.$root.$emit('auth-changed');
+        // Simulasi API call
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulasi data user
+        const user = {
+          name: this.loginData.username,
+          avatar: '/api/placeholder/60/60'
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // Redirect ke landing page
+        this.$router.push('/');
+
+        // Reset form
+        this.loginData = { username: '', password: '' };
+        
+        console.log('Login berhasil:', user);
       } catch (error) {
         alert(error.message || 'Login gagal');
       } finally {

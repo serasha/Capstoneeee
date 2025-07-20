@@ -30,6 +30,8 @@ func CreateAdmin(db *gorm.DB) fiber.Handler {
 			})
 		}
 
+		input.Role = "admin" // Set role admin
+
 		if err := db.Create(&input).Error; err != nil {
 			return c.Status(500).JSON(fiber.Map{
 				"error": "Gagal menyimpan data admin",
