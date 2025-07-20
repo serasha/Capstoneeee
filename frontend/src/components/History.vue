@@ -99,7 +99,47 @@ export default {
   name: 'StatusPengajuan',
   data() {
     return {
-      statusData: [
+      statusData: [],
+      loading: true,
+      errorMsg: ''
+    }
+  },
+  async created() {
+    try {
+      const res = await fetch('/api/pendaftaran/user', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        this.statusData = data.map(item => ({
+          tanggalPengajuan: item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
+          nama: item.nama_pendaftar || '-',
+          kotaAsal: item.alamat_pendaftar || '-',
+          tujuanTransmigrasi: item.jenis_layanan || '-',
+          nomorRegistrasi: item.id_pendaftaran || '-',
+          status: item.status_pendaftar || '-'
+        }));
+      } else {
+        this.errorMsg = 'Gagal mengambil data status pendaftaran';
+      }
+    } catch (e) {
+      this.errorMsg = 'Gagal mengambil data status pendaftaran';
+    } finally {
+      this.loading = false;
+      statusData: []
+    }
+  },
+  mounted() {
+    // Ambil data history dari localStorage
+    const saved = localStorage.getItem('pendaftaranHistory');
+    if (saved) {
+      try {
+        this.statusData = JSON.parse(saved);
+      } catch (e) {
+        this.statusData = [];
+      }
+    }
+    // Jika tidak ada data, tampilkan dummy
+    if (!this.statusData || this.statusData.length === 0) {
+      this.statusData = [
         {
           tanggalPengajuan: '12/05/2025',
           nama: 'HENDRAWAN SUJATMIKO, S.T.',
