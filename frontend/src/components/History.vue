@@ -75,6 +75,13 @@
       </div>
     </div>
 
+    <!-- Tombol Beranda -->
+    <div class="text-center my-4">
+      <button class="btn btn-danger btn-beranda" @click="goToHome">
+        <i class="fas fa-home me-2"></i>Beranda
+      </button>
+    </div>
+
     <!-- Empty State (jika tidak ada data) -->
     <div v-if="statusData.length === 0" class="empty-state text-center py-5">
       <div class="mb-4">
@@ -91,7 +98,22 @@ export default {
   name: 'StatusPengajuan',
   data() {
     return {
-      statusData: [
+      statusData: []
+    }
+  },
+  mounted() {
+    // Ambil data history dari localStorage
+    const saved = localStorage.getItem('pendaftaranHistory');
+    if (saved) {
+      try {
+        this.statusData = JSON.parse(saved);
+      } catch (e) {
+        this.statusData = [];
+      }
+    }
+    // Jika tidak ada data, tampilkan dummy
+    if (!this.statusData || this.statusData.length === 0) {
+      this.statusData = [
         {
           tanggalPengajuan: '12/05/2025',
           nama: 'HENDRAWAN SUJATMIKO, S.T.',
@@ -108,7 +130,7 @@ export default {
           nomorRegistrasi: '2025/1/03/CATRANS/YK',
           status: 'Selesai'
         }
-      ]
+      ];
     }
   },
   methods: {
@@ -129,6 +151,9 @@ export default {
         default:
           return 'bg-primary text-white';
       }
+    },
+    goToHome() {
+      this.$router.push('/');
     }
   }
 }
@@ -346,6 +371,23 @@ export default {
     text-align: left !important;
     margin-top: 1rem;
   }
+}
+
+.btn-beranda {
+  background: linear-gradient(135deg, #dc3545, #e74c3c);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 32px;
+  font-size: 1rem;
+  box-shadow: 0 4px 16px rgba(220,53,69,0.12);
+  border: none;
+  transition: all 0.2s;
+}
+.btn-beranda:hover {
+  background: linear-gradient(135deg, #c82333, #dc3545);
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 /* Custom scrollbar */

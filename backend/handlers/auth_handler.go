@@ -2,10 +2,11 @@
 package handlers
 
 import (
+	"my-app/backend/models"
 	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
-	"my-app/backend/models"
 )
 
 type LoginInput struct {
@@ -23,9 +24,10 @@ func LoginAdmin(db *gorm.DB) fiber.Handler {
 		}
 
 		var admin models.Admin
-		if err := db.Where("username = ? AND password = ?", input.Username, input.Password).First(&admin).Error; err != nil {
+		// Hanya bisa login jika role admin
+		if err := db.Where("username = ? AND password = ? AND role = ?", input.Username, input.Password, "admin").First(&admin).Error; err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Username atau password salah",
+				"error": "Username atau password salah atau bukan akun admin",
 			})
 		}
 
@@ -140,4 +142,3 @@ func RegisterMasyarakat(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
-

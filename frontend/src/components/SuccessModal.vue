@@ -65,14 +65,6 @@
 
               <!-- Additional Info -->
               <div class="additional-info">
-                <div class="info-item">
-                  <i class="fas fa-envelope text-primary"></i>
-                  <span>Email konfirmasi telah dikirim</span>
-                </div>
-                <div class="info-item">
-                  <i class="fas fa-shield-alt text-success"></i>
-                  <span>Akun Anda aman dan terverifikasi</span>
-                </div>
               </div>
             </div>
 

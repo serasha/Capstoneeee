@@ -136,13 +136,20 @@ export default {
         // Simulasi API call
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Emit event atau redirect setelah login berhasil
-        this.$emit('login-success', this.loginData);
-        
+        // Simulasi data user
+        const user = {
+          name: this.loginData.username,
+          avatar: '/api/placeholder/60/60'
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+
+        // Redirect ke landing page
+        this.$router.push('/');
+
         // Reset form
         this.loginData = { username: '', password: '' };
         
-        console.log('Login berhasil:', this.loginData);
+        console.log('Login berhasil:', user);
       } catch (error) {
         console.error('Login gagal:', error);
         // Handle error

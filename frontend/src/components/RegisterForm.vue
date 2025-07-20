@@ -42,6 +42,8 @@
               class="form-control custom-input" 
               v-model="formData.nik"
               required
+              inputmode="numeric"
+              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-6">
@@ -72,6 +74,8 @@
               class="form-control custom-input" 
               v-model="formData.nomorKK"
               required
+              inputmode="numeric"
+              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-6">
@@ -128,6 +132,8 @@
               class="form-control custom-input" 
               v-model="formData.nomorTelepon"
               required
+              inputmode="numeric"
+              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-6">
@@ -146,6 +152,8 @@
               class="form-control custom-input" 
               v-model="formData.jumlahAnggota"
               required
+              inputmode="numeric"
+              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-4">
@@ -155,6 +163,8 @@
               class="form-control custom-input" 
               v-model="formData.kodePos"
               required
+              inputmode="numeric"
+              pattern="[0-9]*"
             >
           </div>
           <div class="col-md-4">
@@ -285,6 +295,8 @@
               class="form-control custom-input" 
               v-model="formData.nomorPendaftaran"
               required
+              inputmode="numeric"
+              pattern="[0-9]*"
             >
           </div>
         </div>
@@ -310,7 +322,7 @@
 
     <SuccessModal
       :visible="showSuccessModal"
-      :userData="{ fullName: formData.namaKepalaKeluarga }"
+       :userData="{ fullName: loggedInUserName || formData.namaKepalaKeluarga }"
       @close="showSuccessModal = false"
       @view-status="goToStatus"
       @go-to-dashboard="goToDashboard"
@@ -330,6 +342,7 @@ export default {
       isSubmitting: false,
       uploadedFiles: [],
       showSuccessModal: false,
+      loggedInUserName: '', // Tambahkan ini
       formData: {
         namaKepalaKeluarga: '',
         jenisKelamin: '',
@@ -353,6 +366,18 @@ export default {
         namaLokasi: '',
         polaUsaha: '',
         nomorPendaftaran: ''
+      }
+    }
+  },
+  mounted() {
+    // Ambil nama user dari localStorage jika ada
+    const user = localStorage.getItem('user');
+    if (user) {
+      try {
+        const parsed = JSON.parse(user);
+        this.loggedInUserName = parsed.name || '';
+      } catch (e) {
+        this.loggedInUserName = '';
       }
     }
   },
@@ -385,6 +410,27 @@ export default {
         console.log('Form Data:', this.formData);
         console.log('Uploaded Files:', this.uploadedFiles);
         
+        // Simpan ke localStorage untuk history
+        const historyKey = 'pendaftaranHistory';
+        let historyArr = [];
+        try {
+          const saved = localStorage.getItem(historyKey);
+          if (saved) historyArr = JSON.parse(saved);
+        } catch (e) { historyArr = []; }
+        // Buat data baru untuk history
+        const now = new Date();
+        const tanggalPengajuan = now.toLocaleDateString('id-ID');
+        const nomorRegistrasi = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}/CATRANS/YK`;
+        historyArr.unshift({
+          tanggalPengajuan,
+          nama: this.formData.namaKepalaKeluarga,
+          kotaAsal: this.formData.kota,
+          tujuanTransmigrasi: this.formData.namaLokasi,
+          nomorRegistrasi,
+          status: 'Proses'
+        });
+        localStorage.setItem(historyKey, JSON.stringify(historyArr));
+
         this.showSuccessModal = true; // Tampilkan modal setelah submit sukses
         
       } catch (error) {

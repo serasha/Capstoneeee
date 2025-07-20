@@ -5,8 +5,7 @@ import Home from '../pages/Home.vue'
 import Userlayout from '../Layouts/UserLayout.vue'
 import RegisterForm from '../components/RegisterForm.vue'
 import SuccessModal from '../components/SuccessModal.vue'
-import History from '../components/History.vue'
-import Sidebar from '../pages/admin/Sidebar.vue'
+import History from '../components/History.vue' 
 
 const routes = [
   {
