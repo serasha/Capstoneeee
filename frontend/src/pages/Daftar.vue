@@ -38,6 +38,14 @@
                     {{ errors.namaLengkap ? errors.namaLengkap.replace('Nama lengkap', 'Username') : '' }}
                   </div>
                 </div>
+                <!-- Pilihan Role -->
+                <div class="mb-4">
+                  <label class="form-label-custom mb-3">Role</label>
+                  <select v-model="formData.role" class="form-control custom-input">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
 
                 <!-- Kata Sandi -->
                 <div class="mb-4 position-relative">
@@ -124,7 +132,8 @@ export default {
       formData: {
         namaLengkap: '',
         kataSandi: '',
-        ulangiKataSandi: ''
+        ulangiKataSandi: '',
+        role: 'user',
       },
       errors: {},
       showPassword: false,
@@ -173,7 +182,8 @@ export default {
           },
           body: JSON.stringify({
             namaLengkap: this.formData.namaLengkap,
-            kataSandi: this.formData.kataSandi
+            kataSandi: this.formData.kataSandi,
+            role: this.formData.role,
           }),
         });
         if (!response.ok) {
@@ -184,7 +194,8 @@ export default {
         this.formData = {
           namaLengkap: '',
           kataSandi: '',
-          ulangiKataSandi: ''
+          ulangiKataSandi: '',
+          role: 'user',
         };
       } catch (error) {
         alert(error.message || 'Terjadi kesalahan saat registrasi');
