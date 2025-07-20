@@ -13,10 +13,11 @@ import (
 
 var jwtSecret = []byte("supersecretkey")
 
-func generateJWT(userID uint, username string) (string, error) {
+func generateJWT(userID uint, username string, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"username": username,
+		"role": role,
 		"exp": time.Now().Add(24 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -51,6 +52,7 @@ func SetupUserRoutes(route fiber.Router) {
 		type RegisterRequest struct {
 			NamaLengkap string `json:"namaLengkap"`
 			KataSandi   string `json:"kataSandi"`
+			Role        string `json:"role"`
 		}
 
 		var req RegisterRequest
@@ -96,9 +98,12 @@ func SetupUserRoutes(route fiber.Router) {
 		}
 
 		// Buat user baru
+		role := req.Role
+		if role != "admin" { role = "user" }
 		user := models.User{
 			Username: req.NamaLengkap,
 			Password: string(hashedPassword),
+			Role: role,
 		}
 
 		// Simpan ke database
@@ -132,6 +137,7 @@ func SetupUserRoutes(route fiber.Router) {
 			"user": fiber.Map{
 				"id":       user.ID,
 				"username": user.Username,
+				"role": user.Role,
 			},
 		})
 	})
@@ -179,7 +185,7 @@ func SetupUserRoutes(route fiber.Router) {
 		}
 
 		// Generate JWT
-		tokenString, err := generateJWT(user.ID, user.Username)
+		tokenString, err := generateJWT(user.ID, user.Username, user.Role)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat token"})
 		}
@@ -198,6 +204,7 @@ func SetupUserRoutes(route fiber.Router) {
 			"user": fiber.Map{
 				"id":       user.ID,
 				"username": user.Username,
+				"role": user.Role,
 			},
 		})
 	})
@@ -219,9 +226,21 @@ func SetupUserRoutes(route fiber.Router) {
 	userGroup.Get("/me", AuthRequired, func(c *fiber.Ctx) error {
 		userID := c.Locals("user_id")
 		username := c.Locals("username")
+		role := "user"
+		cookie := c.Cookies("jwt")
+		if cookie != "" {
+			token, _ := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) { return jwtSecret, nil })
+			if token != nil && token.Valid {
+				claims, ok := token.Claims.(jwt.MapClaims)
+				if ok && claims["role"] != nil {
+					role = claims["role"].(string)
+				}
+			}
+		}
 		return c.JSON(fiber.Map{
 			"id": userID,
 			"username": username,
+			"role": role,
 		})
 	})
 }

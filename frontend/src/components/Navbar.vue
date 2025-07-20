@@ -35,8 +35,8 @@
       <!-- Right side buttons -->
       <div class="d-flex gap-2 mb-0 me-4 daftar-masuk-group">
         <template v-if="!loading">
-          <template v-if="user">
-            <span class="text-white me-2">👤 {{ user.username }}</span>
+          <template v-if="isAuthenticated && user">
+            <span class="text-white me-2">👤 {{ user.username }} <span v-if="user.role">({{ user.role }})</span></span>
             <button class="btn btn-outline-light" @click="logout">Logout</button>
           </template>
           <template v-else>
@@ -93,85 +93,20 @@
 </template>
 
 <script>
+import { useUserStore } from '@/store/userStore'
+import { storeToRefs } from 'pinia'
 export default {
   name: 'Navbar',
-  data() {
-    return {
-      user: null,
-      loading: true,
-      user: {
-        name: '',
-        avatar: ''
-      },
-      isLoggedIn: false,
-      showDefaultAvatar: false,
-      dropdownOpen: false
+  setup() {
+    const userStore = useUserStore()
+    const { user, isAuthenticated, loading } = storeToRefs(userStore)
+    const logout = async () => {
+      await fetch('/api/user/logout', { method: 'POST', credentials: 'include' })
+      userStore.logout()
+      window.location.href = '/login'
     }
-  },
-  created() {
-    this.checkAuth();
-  },
-  methods: {
-    async checkAuth() {
-      try {
-        const res = await fetch('/api/user/me', { credentials: 'include' });
-        if (res.ok) {
-          const data = await res.json();
-          this.user = data;
-        } else {
-          this.user = null;
-        }
-      } catch {
-        this.user = null;
-      } finally {
-        this.loading = false;
-      }
-    },
-    async logout() {
-      await fetch('/api/user/logout', { method: 'POST', credentials: 'include' });
-      this.user = null;
-      this.$router.push('/login');
-    },
-    logout() {
-      localStorage.removeItem('user');
-      this.isLoggedIn = false;
-      this.user = { name: '', avatar: '' };
-      this.showDefaultAvatar = false;
-      this.dropdownOpen = false;
-      this.$router.push('/');
-    },
-    checkLogin() {
-      const user = localStorage.getItem('user');
-      if (user) {
-        this.user = JSON.parse(user);
-        this.isLoggedIn = true;
-        if (!this.user.avatar) {
-          this.showDefaultAvatar = true;
-        } else {
-          this.showDefaultAvatar = false;
-        }
-      } else {
-        this.isLoggedIn = false;
-        this.user = { name: '', avatar: '' };
-        this.showDefaultAvatar = true;
-      }
-    },
-    toggleDropdown() {
-      this.dropdownOpen = !this.dropdownOpen;
-    },
-    closeDropdown() {
-      // Delay to allow click event on dropdown item
-      setTimeout(() => {
-        this.dropdownOpen = false;
-      }, 150);
-    }
-  },
-  mounted() {
-    this.checkLogin();
-    window.addEventListener('storage', this.checkLogin);
-  },
-  beforeUnmount() {
-    window.removeEventListener('storage', this.checkLogin);
+    userStore.fetchUser()
+    return { user, isAuthenticated, loading, logout }
   }
 }
 </script>

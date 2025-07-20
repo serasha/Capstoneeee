@@ -93,4 +93,36 @@ const router = createRouter({
   routes
 })
 
+// Global navigation guard untuk otorisasi dan redirect sesuai role
+router.beforeEach(async (to, from, next) => {
+  // Cek role user dari backend
+  let user = null
+  try {
+    const res = await fetch('/api/user/me', { credentials: 'include' })
+    if (res.ok) {
+      user = await res.json()
+    }
+  } catch {}
+
+  // Jika route /admin, hanya admin yang boleh akses
+  if (to.path.startsWith('/admin')) {
+    if (!user || user.role !== 'admin') {
+      return next('/login')
+    }
+    return next()
+  }
+
+  // Jika user login dan role admin, redirect ke /admin/dashboard
+  if (user && user.role === 'admin' && (to.path === '/' || to.path === '/login' || to.path === '/daftar')) {
+    return next('/admin/dashboard')
+  }
+
+  // Jika user login dan role user, dan akses /login atau /daftar, redirect ke home
+  if (user && user.role === 'user' && (to.path === '/login' || to.path === '/daftar')) {
+    return next('/')
+  }
+
+  next()
+})
+
 export default router
