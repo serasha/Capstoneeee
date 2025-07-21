@@ -48,39 +48,8 @@
             </router-link>
           </template>
         </template>
-
-      <div v-else class="d-flex align-items-center gap-3 me-4">
-        <div class="d-flex align-items-center position-relative">
-          <div class="profile-dropdown" @click="toggleDropdown" @blur="closeDropdown" tabindex="0">
-            <img 
-              v-if="user.avatar"
-              :src="user.avatar" 
-              alt="avatar" 
-              class="rounded-circle avatar-img-navbar"
-              style="width:36px;height:36px;object-fit:cover;border:2px solid #ffca28;"
-              @error="showDefaultAvatar = true"
-              v-show="!showDefaultAvatar"
-            >
-            <span v-if="showDefaultAvatar || !user.avatar" class="rounded-circle avatar-img-navbar avatar-default-navbar" style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;background:#ffe082;border:2px solid #ffca28;">
-              <!-- SVG icon profile -->
-              <svg width="32" height="32" viewBox="0 0 60 60" fill="none">
-                <circle cx="30" cy="30" r="30" fill="#ffe082"/>
-                <circle cx="30" cy="24" r="12" fill="#ffca28"/>
-                <ellipse cx="30" cy="44" rx="16" ry="10" fill="#ffca28"/>
-              </svg>
-            </span>
-            <span class="ms-2 text-white fw-semibold">{{ user.name }}</span>
-            <i class="fas fa-caret-down ms-2 text-white"></i>
-            <div v-if="dropdownOpen" class="dropdown-menu show">
-              <button class="dropdown-item" @mousedown.prevent="logout">
-                <i class="fas fa-sign-out-alt me-2"></i> Logout
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
-      </div>
   </nav>
 </template>
 
