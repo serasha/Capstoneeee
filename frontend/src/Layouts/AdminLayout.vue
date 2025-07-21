@@ -33,10 +33,29 @@ export default {
   data() {
     return {
       userData: {
-        name: 'Heltrizulfikar. java',
-        id: '190002290',
-        avatar: 'https://via.placeholder.com/50x50/6c757d/ffffff?text=HJ'
+        name: '',
+        id: '',
+        avatar: ''
       }
+    }
+  },
+  async created() {
+    try {
+      const res = await fetch('/api/user/me', { credentials: 'include' })
+      if (res.ok) {
+        const user = await res.json()
+        this.userData.name = user.name || user.username || 'Admin'
+        this.userData.id = user.id || user._id || '-'
+        this.userData.avatar = user.avatar || 'https://i.pravatar.cc/300'
+      } else {
+        this.userData.name = 'Admin'
+        this.userData.id = '-'
+        this.userData.avatar = 'https://i.pravatar.cc/300'
+      }
+    } catch {
+      this.userData.name = 'Admin'
+      this.userData.id = '-'
+      this.userData.avatar = 'https://i.pravatar.cc/300'
     }
   }
 }
