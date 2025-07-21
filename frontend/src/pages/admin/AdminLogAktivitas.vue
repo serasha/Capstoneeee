@@ -42,19 +42,21 @@
           <thead>
             <tr>
               <th>No</th>
-              <th>No. Pendaftaran</th>
-              <th>Hari/Tanggal</th>
-              <th>Aktivitas</th>
+              <th>Tanggal</th>
+              <th>Admin</th>
+              <th>Aksi</th>
+              <th>Target</th>
+              <th>Deskripsi</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in paginatedData" :key="item.id">
+            <tr v-for="(item, index) in tableData" :key="item.id">
               <td>{{ getRowNumber(index) }}</td>
-              <td class="registration-number">{{ item.noPendaftaran }}</td>
-              <td>{{ item.hariTanggal }}</td>
-              <td>
-                <span class="activity-badge">{{ item.aktivitas }}</span>
-              </td>
+              <td>{{ item.tanggal }}</td>
+              <td>{{ item.admin }}</td>
+              <td>{{ item.aksi }}</td>
+              <td>{{ item.target }}</td>
+              <td>{{ item.deskripsi }}</td>
             </tr>
           </tbody>
         </table>
@@ -63,7 +65,7 @@
       <!-- Pagination -->
       <div class="pagination-section">
         <div class="pagination-info">
-          Showing {{ startEntry }} to {{ endEntry }} of {{ filteredData.length }} entries
+          Showing {{ startEntry }} to {{ endEntry }} of {{ totalEntries }} entries
         </div>
         <div class="pagination-controls">
           <button 
@@ -109,83 +111,58 @@ export default {
       searchQuery: '',
       entriesPerPage: 5,
       currentPage: 1,
-      logData: [
-        {
-          id: 1,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          aktivitas: 'Verifikasi Berkas'
-        },
-        {
-          id: 2,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          aktivitas: 'Verifikasi Berkas'
-        },
-        {
-          id: 3,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          aktivitas: 'Verifikasi Berkas'
-        },
-        {
-          id: 4,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          aktivitas: 'Verifikasi Berkas'
-        },
-        {
-          id: 5,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          aktivitas: 'Verifikasi Berkas'
-        }
-      ]
+      totalEntries: 0,
+      tableData: [],
+      loading: false
     }
   },
   computed: {
-    filteredData() {
-      if (!this.searchQuery) {
-        return this.logData;
-      }
-      return this.logData.filter(item =>
-        item.noPendaftaran.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        item.hariTanggal.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        item.aktivitas.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
-    paginatedData() {
-      const start = (this.currentPage - 1) * this.entriesPerPage;
-      const end = start + parseInt(this.entriesPerPage);
-      return this.filteredData.slice(start, end);
-    },
     totalPages() {
-      return Math.ceil(this.filteredData.length / this.entriesPerPage);
+      return Math.ceil(this.totalEntries / this.entriesPerPage) || 1;
     },
     startEntry() {
       return (this.currentPage - 1) * this.entriesPerPage + 1;
     },
     endEntry() {
-      const end = this.currentPage * this.entriesPerPage;
-      return Math.min(end, this.filteredData.length);
+      return Math.min(this.currentPage * this.entriesPerPage, this.totalEntries);
     }
   },
   methods: {
     getRowNumber(index) {
       return (this.currentPage - 1) * this.entriesPerPage + index + 1;
     },
+    async fetchData() {
+      this.loading = true;
+      const params = new URLSearchParams({
+        page: this.currentPage,
+        page_size: this.entriesPerPage
+      });
+      const res = await fetch(`/api/log-aktivitas?${params.toString()}`, { credentials: 'include' });
+      const json = await res.json();
+      this.tableData = (json.data || []).map(item => ({
+        id: item.id,
+        tanggal: item.created_at ? new Date(item.created_at).toLocaleString() : '-',
+        admin: item.admin && item.admin.username ? item.admin.username : (item.admin_id || '-'),
+        aksi: item.aksi,
+        target: item.target,
+        deskripsi: item.deskripsi
+      }));
+      this.totalEntries = json.total || 0;
+      this.loading = false;
+    },
     previousPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        this.fetchData();
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
+        this.fetchData();
       }
     },
     downloadData() {
-      // Simulate download
       const csvContent = this.generateCSV();
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
@@ -196,12 +173,14 @@ export default {
       window.URL.revokeObjectURL(url);
     },
     generateCSV() {
-      const headers = ['No', 'No. Pendaftaran', 'Hari/Tanggal', 'Aktivitas'];
-      const rows = this.filteredData.map((item, index) => [
+      const headers = ['No', 'Tanggal', 'Admin', 'Aksi', 'Target', 'Deskripsi'];
+      const rows = this.tableData.map((item, index) => [
         index + 1,
-        item.noPendaftaran,
-        item.hariTanggal,
-        item.aktivitas
+        item.tanggal,
+        item.admin,
+        item.aksi,
+        item.target,
+        item.deskripsi
       ]);
       return [headers, ...rows].map(row => row.join(',')).join('\n');
     }
@@ -209,10 +188,15 @@ export default {
   watch: {
     searchQuery() {
       this.currentPage = 1;
+      // Optional: implement search on backend if needed
     },
     entriesPerPage() {
       this.currentPage = 1;
+      this.fetchData();
     }
+  },
+  mounted() {
+    this.fetchData();
   }
 }
 </script>

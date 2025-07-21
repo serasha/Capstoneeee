@@ -142,3 +142,72 @@ func DeletePendaftaran(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+// GetPendaftaranList untuk admin, mendukung filter dan pagination
+func GetPendaftaranList(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var pendaftarans []models.Pendaftaran
+		var total int64
+		page := c.QueryInt("page", 1)
+		pageSize := c.QueryInt("page_size", 10)
+		status := c.Query("status")
+		nama := c.Query("nama")
+		jenis := c.Query("jenis_layanan")
+
+		query := db.Model(&models.Pendaftaran{})
+		if status != "" {
+			query = query.Where("status_pendaftar = ?", status)
+		}
+		if nama != "" {
+			query = query.Where("nama_pendaftar LIKE ?", "%"+nama+"%")
+		}
+		if jenis != "" {
+			query = query.Where("jenis_layanan = ?", jenis)
+		}
+
+		query.Count(&total)
+		if err := query.Order("created_at DESC").Offset((page-1)*pageSize).Limit(pageSize).Find(&pendaftarans).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal mengambil data pendaftaran"})
+		}
+		return c.JSON(fiber.Map{
+			"data": pendaftarans,
+			"total": total,
+			"page": page,
+			"page_size": pageSize,
+		})
+	}
+}
+
+// VerifikasiPendaftaran untuk update status_pendaftar
+func VerifikasiPendaftaran(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		var input struct {
+			StatusPendaftar string `json:"status_pendaftar"`
+		}
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Input tidak valid"})
+		}
+		var pendaftaran models.Pendaftaran
+		if err := db.First(&pendaftaran, id).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		pendaftaran.StatusPendaftar = input.StatusPendaftar
+		if err := db.Save(&pendaftaran).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal update status"})
+		}
+
+		// Tambahkan log aktivitas admin
+		adminID, ok := c.Locals("admin_id").(uint)
+		if ok && adminID != 0 {
+			action := "Verifikasi"
+			if input.StatusPendaftar == "ditolak" {
+				action = "Tolak"
+			}
+			deskripsi := "Pendaftaran ID: " + id
+			_ = CreateLogAktifitas(db, adminID, action, "Pendaftaran", deskripsi)
+		}
+
+		return c.JSON(pendaftaran)
+	}
+}

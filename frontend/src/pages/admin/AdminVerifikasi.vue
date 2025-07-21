@@ -51,7 +51,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in paginatedData" :key="item.id">
+            <tr v-for="(item, index) in tableData" :key="item.id">
               <td>{{ getRowNumber(index) }}</td>
               <td class="registration-number">{{ item.noPendaftaran }}</td>
               <td>{{ item.hariTanggal }}</td>
@@ -75,7 +75,7 @@
       <!-- Pagination -->
       <div class="pagination-section">
         <div class="pagination-info">
-          Showing {{ startEntry }} to {{ endEntry }} of {{ filteredData.length }} entries
+          Showing {{ startEntry }} to {{ endEntry }} of {{ totalEntries }} entries
         </div>
         <div class="pagination-controls">
           <button 
@@ -110,112 +110,87 @@
         </div>
       </div>
     </div>
+    <VerifikasiModal
+      v-if="modalOpen"
+      :visible="modalOpen"
+      :pendaftaran="selectedPendaftaran"
+      @close="modalOpen = false"
+      @success="onVerifikasiSuccess"
+    />
   </div>
 </template>
 
 <script>
+import VerifikasiModal from '@/components/VerifikasiModal.vue'
+
 export default {
   name: 'AdminVerifikasi',
+  components: { VerifikasiModal },
   data() {
     return {
       searchQuery: '',
       entriesPerPage: 5,
       currentPage: 1,
-      verifikasiData: [
-        {
-          id: 1,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          namaPendaftar: 'Firda Ro',
-          kotaAsal: 'Yogyakarta',
-          tujuanTransmigrasi: 'Sulawesi',
-          isVerified: false
-        },
-        {
-          id: 2,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          namaPendaftar: 'Wahyudi Nurul',
-          kotaAsal: 'Yogyakarta',
-          tujuanTransmigrasi: 'Sulawesi',
-          isVerified: true
-        },
-        {
-          id: 3,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          namaPendaftar: 'Wahyudi Nurul',
-          kotaAsal: 'Yogyakarta',
-          tujuanTransmigrasi: 'Sulawesi',
-          isVerified: true
-        },
-        {
-          id: 4,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          namaPendaftar: 'Wahyudi Nurul',
-          kotaAsal: 'Yogyakarta',
-          tujuanTransmigrasi: 'Sulawesi',
-          isVerified: true
-        },
-        {
-          id: 5,
-          noPendaftaran: 'LPR202502130005',
-          hariTanggal: 'Kamis 13/Feb/2025',
-          namaPendaftar: 'Wahyudi Nurul',
-          kotaAsal: 'Yogyakarta',
-          tujuanTransmigrasi: 'Sulawesi',
-          isVerified: true
-        }
-      ]
+      totalEntries: 0,
+      tableData: [],
+      loading: false,
+      modalOpen: false,
+      selectedPendaftaran: null
     }
   },
   computed: {
-    filteredData() {
-      if (!this.searchQuery) {
-        return this.verifikasiData;
-      }
-      return this.verifikasiData.filter(item =>
-        item.noPendaftaran.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        item.namaPendaftar.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        item.kotaAsal.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        item.tujuanTransmigrasi.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
-    paginatedData() {
-      const start = (this.currentPage - 1) * this.entriesPerPage;
-      const end = start + parseInt(this.entriesPerPage);
-      return this.filteredData.slice(start, end);
-    },
     totalPages() {
-      return Math.ceil(this.filteredData.length / this.entriesPerPage);
+      return Math.ceil(this.totalEntries / this.entriesPerPage) || 1;
     },
     startEntry() {
       return (this.currentPage - 1) * this.entriesPerPage + 1;
     },
     endEntry() {
-      const end = this.currentPage * this.entriesPerPage;
-      return Math.min(end, this.filteredData.length);
+      return Math.min(this.currentPage * this.entriesPerPage, this.totalEntries);
     }
   },
   methods: {
     getRowNumber(index) {
       return (this.currentPage - 1) * this.entriesPerPage + index + 1;
     },
+    async fetchData() {
+      this.loading = true;
+      const params = new URLSearchParams({
+        page: this.currentPage,
+        page_size: this.entriesPerPage,
+        nama: this.searchQuery
+      });
+      const res = await fetch(`/api/pendaftaran/list?${params.toString()}`, { credentials: 'include' });
+      const json = await res.json();
+      this.tableData = (json.data || []).map(item => ({
+        id: item.id_pendaftaran,
+        noPendaftaran: item.id_pendaftaran,
+        hariTanggal: item.tanggal_pendaftar ? new Date(item.tanggal_pendaftar).toLocaleDateString() : '-',
+        namaPendaftar: item.nama_pendaftar,
+        kotaAsal: item.alamat_pendaftar,
+        tujuanTransmigrasi: item.jenis_layanan,
+        isVerified: item.status_pendaftar === 'verifikasi'
+      }));
+      this.totalEntries = json.total || 0;
+      this.loading = false;
+    },
     verifikasiData(item) {
-      if (!item.isVerified) {
-        item.isVerified = true;
-        alert(`Data ${item.namaPendaftar} berhasil diverifikasi!`);
-      }
+      this.selectedPendaftaran = item
+      this.modalOpen = true
+    },
+    onVerifikasiSuccess() {
+      this.fetchData()
     },
     previousPage() {
       if (this.currentPage > 1) {
         this.currentPage--;
+        this.fetchData();
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage++;
+        this.fetchData();
       }
     },
     downloadData() {
@@ -231,7 +206,7 @@ export default {
     },
     generateCSV() {
       const headers = ['No', 'No. Pendaftaran', 'Hari/Tanggal', 'Nama Pendaftar', 'Kota Asal', 'Tujuan Transmigrasi', 'Status'];
-      const rows = this.filteredData.map((item, index) => [
+      const rows = this.tableData.map((item, index) => [
         index + 1,
         item.noPendaftaran,
         item.hariTanggal,
@@ -246,10 +221,15 @@ export default {
   watch: {
     searchQuery() {
       this.currentPage = 1;
+      this.fetchData();
     },
     entriesPerPage() {
       this.currentPage = 1;
+      this.fetchData();
     }
+  },
+  mounted() {
+    this.fetchData();
   }
 }
 </script>
@@ -487,5 +467,29 @@ export default {
   .data-table td {
     padding: 0.75rem 0.5rem;
   }
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
 }
 </style>

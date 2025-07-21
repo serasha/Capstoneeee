@@ -31,6 +31,9 @@ func LoginAdmin(db *gorm.DB) fiber.Handler {
 			})
 		}
 
+		// Set admin_id ke context agar bisa diambil di handler lain
+		c.Locals("admin_id", admin.ID)
+
 		return c.JSON(fiber.Map{
 			"message": "Login admin berhasil",
 			"data":    admin,

@@ -14,6 +14,7 @@ import (
 	"my-app/backend/database"
 	"my-app/backend/models"
 	"my-app/backend/routes"
+	"my-app/backend/utils"
 )
 
 var store = session.New()
@@ -35,6 +36,7 @@ func main() {
 		&models.Admin{},
 		&models.SuperAdmin{},
 		&models.User{},
+		&models.LogAktifitas{},
 	)
 	log.Println("Dropping old tables...")
 
@@ -48,11 +50,15 @@ func main() {
 		&models.Dikelola{},
 		&models.SuperAdmin{},
 		&models.User{},
+		&models.LogAktifitas{},
 	)
 	if err != nil {
 		log.Fatal("Migrasi gagal:", err)
 	}
 	log.Println("Migrasi berhasil!")
+
+	// Jalankan seeder (bisa dikomentari jika tidak ingin seed setiap start)
+	utils.SeedAll(database.DB)
 
 	// 🚀 Setup Fiber
 	app := fiber.New()
@@ -70,6 +76,8 @@ func main() {
 	routes.SetupDaftarRoutes(api)
 	routes.SetupUserRoutes(api)
 	routes.PendaftaranRoutes(api, database.DB)
+	routes.LogAktifitasRoutes(api, database.DB)
+	routes.AdminRoutes(app, database.DB)
 
 	// 📦 Serve static files (Vue build result)
 	app.Static("/", "../frontend/dist")
