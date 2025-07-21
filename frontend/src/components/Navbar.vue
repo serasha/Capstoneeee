@@ -48,15 +48,7 @@
             </router-link>
           </template>
         </template>
-      <!-- Right side: conditional -->
-      <div class="d-flex gap-2 mb-0 me-4 daftar-masuk-group" v-if="!isLoggedIn">
-        <router-link to="/daftar" class="btn btn-outline-warning daftar-btn">
-          Daftar
-        </router-link>
-        <router-link to="/login" class="btn btn-warning masuk-btn">
-          Masuk
-        </router-link>
-      </div>
+
       <div v-else class="d-flex align-items-center gap-3 me-4">
         <div class="d-flex align-items-center position-relative">
           <div class="profile-dropdown" @click="toggleDropdown" @blur="closeDropdown" tabindex="0">
