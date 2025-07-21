@@ -65,16 +65,21 @@
 </template>
 
 <script>
+import { useUserStore } from '@/store/userStore'
+
 export default {
   name: 'AdminSidebar',
   methods: {
     isActiveRoute(path) {
       return this.$route.path === path;
     },
-    handleLogout() {
-      // Handle logout logic
-      localStorage.removeItem('adminUser');
-      this.$router.push('/login');
+    async handleLogout() {
+      const userStore = useUserStore()
+      try {
+        await fetch('/api/user/logout', { method: 'POST', credentials: 'include' })
+      } catch {}
+      userStore.logout()
+      window.location.href = '/login'
     }
   }
 }
