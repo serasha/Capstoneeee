@@ -95,49 +95,42 @@ const router = createRouter({
   routes
 })
 
-// Global navigation guard untuk otorisasi dan redirect sesuai role
+// Ubah route guard agar:
+// - Guest: hanya akses /, /login, /daftar
+// - User: akses / (Home) dan fitur user
+// - Admin: akses /admin/*
+
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
   const { user, isAuthenticated, guest, role } = storeToRefs(userStore)
-  // Pastikan state sudah di-fetch
   if (userStore.user === null && !userStore.loading) {
     await userStore.fetchUser()
   }
 
-  // Jika guest (belum login), hanya boleh akses /login, /daftar
+  // Guest: hanya boleh akses Home, Login, Daftar
   if (guest.value) {
-    if (to.path !== '/login' && to.path !== '/daftar') {
-      return next('/login')
-    }
-    return next()
-  }
-
-  // Jika route /admin, hanya admin yang boleh akses
-  if (to.path.startsWith('/admin')) {
-    if (role.value !== 'admin') {
+    if (to.path !== '/' && to.path !== '/login' && to.path !== '/daftar') {
       return next('/')
     }
     return next()
   }
 
-  // Jika user login dan role admin, dan akses route user (bukan /admin), redirect ke /admin/dashboard
-  if (role.value === 'admin' && !to.path.startsWith('/admin')) {
-    return next('/admin/dashboard')
+  // Admin: boleh akses semua, tapi fitur admin hanya di /admin/*
+  if (role.value === 'admin') {
+    // Tidak perlu redirect ke dashboard, biarkan akses /
+    return next()
   }
 
-  // Jika user login dan role user, dan akses route /admin, redirect ke /
-  if (role.value === 'user' && to.path.startsWith('/admin')) {
-    return next('/')
-  }
-
-  // Jika user login dan role user, dan akses /login atau /daftar, redirect ke home
-  if (role.value === 'user' && (to.path === '/login' || to.path === '/daftar')) {
-    return next('/')
-  }
-
-  // Jika user login dan role admin, dan akses /login atau /daftar, redirect ke /admin/dashboard
-  if (role.value === 'admin' && (to.path === '/login' || to.path === '/daftar')) {
-    return next('/admin/dashboard')
+  // User: tidak boleh akses /admin/*
+  if (role.value === 'user') {
+    if (to.path.startsWith('/admin')) {
+      return next('/')
+    }
+    // Jika user login dan akses /login atau /daftar, redirect ke home
+    if (to.path === '/login' || to.path === '/daftar') {
+      return next('/')
+    }
+    return next()
   }
 
   next()

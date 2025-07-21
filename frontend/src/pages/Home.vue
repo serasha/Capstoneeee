@@ -1,22 +1,19 @@
+<script setup>
+import HeroSection from '../components/HeroSection.vue'
+import Section from '../components/Section.vue'
+import { useUserStore } from '@/store/userStore'
+import { storeToRefs } from 'pinia'
+
+const userStore = useUserStore()
+const { role } = storeToRefs(userStore)
+</script>
+
 <template>
   <div class="home">
     <HeroSection />
-    <Section />
+    <Section :role="role" />
   </div>
 </template>
-
-<script>
-import HeroSection from '../components/HeroSection.vue'
-import Section from '../components/Section.vue'
-
-export default {
-  name: 'Home',
-  components: {
-    HeroSection,
-    Section
-  }
-}
-</script>
 
 <style scoped>
 .home {

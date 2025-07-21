@@ -10,34 +10,42 @@
         
         <!-- Service Cards -->
         <div class="row justify-content-center g-4 mb-5">
-          <template v-if="!loading">
-            <template v-if="user">
-              <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToFormulir">
-                  <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
-                    <span class="service-icon" style="font-size:2.5rem;">📝</span>
-                  </div>
-                  <div class="service-title text-center">
-                    <div class="title-line">Pendaftaran</div>
-                    <div class="title-line">Formulir</div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToStatus">
-                  <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
-                    <span class="service-icon" style="font-size:2.5rem;">📊</span>
-                  </div>
-                  <div class="service-title text-center">
-                    <div class="title-line">Pantau Status</div>
-                    <div class="title-line">Pengajuan</div>
-                  </div>
-                </div>
-              </div>
-            </template>
-            <!-- Bantuan & Konsultasi selalu muncul -->
+          <template v-if="role === 'admin'">
             <div class="col-lg-3 col-md-4 col-sm-6">
-              <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToBantuan">
+              <router-link to="/admin/dashboard" class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow">
+                <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                  <span class="service-icon" style="font-size:2.5rem;">📝</span>
+                </div>
+                <div class="service-title text-center">
+                  <div class="title-line">Pendaftaran</div>
+                  <div class="title-line">Formulir</div>
+                </div>
+              </router-link>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+              <router-link to="/admin/verifikasi" class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow">
+                <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                  <span class="service-icon" style="font-size:2.5rem;">📑</span>
+                </div>
+                <div class="service-title text-center">
+                  <div class="title-line">Verifikasi Data</div>
+                  <div class="title-line">Pendaftar</div>
+                </div>
+              </router-link>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+              <router-link to="/admin/update-status" class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow">
+                <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                  <span class="service-icon" style="font-size:2.5rem;">🔄</span>
+                </div>
+                <div class="service-title text-center">
+                  <div class="title-line">Update Status</div>
+                  <div class="title-line">Pengajuan</div>
+                </div>
+              </router-link>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6">
+              <router-link to="/admin/bantuan" class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow">
                 <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
                   <span class="service-icon" style="font-size:2.5rem;">💬</span>
                 </div>
@@ -45,8 +53,48 @@
                   <div class="title-line">Bantuan &</div>
                   <div class="title-line">Konsultasi</div>
                 </div>
-              </div>
+              </router-link>
             </div>
+          </template>
+          <template v-else>
+            <template v-if="!loading">
+              <template v-if="user">
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                  <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToFormulir">
+                    <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                      <span class="service-icon" style="font-size:2.5rem;">📝</span>
+                    </div>
+                    <div class="service-title text-center">
+                      <div class="title-line">Pendaftaran</div>
+                      <div class="title-line">Formulir</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                  <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToStatus">
+                    <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                      <span class="service-icon" style="font-size:2.5rem;">📊</span>
+                    </div>
+                    <div class="service-title text-center">
+                      <div class="title-line">Pantau Status</div>
+                      <div class="title-line">Pengajuan</div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <!-- Bantuan & Konsultasi selalu muncul -->
+              <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow" @click="goToBantuan">
+                  <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
+                    <span class="service-icon" style="font-size:2.5rem;">💬</span>
+                  </div>
+                  <div class="service-title text-center">
+                    <div class="title-line">Bantuan &</div>
+                    <div class="title-line">Konsultasi</div>
+                  </div>
+                </div>
+              </div>
+            </template>
           </template>
         </div>
       </div>
@@ -148,6 +196,12 @@
 <script>
 export default {
   name: 'LayananTransmigrasi',
+  props: {
+    role: {
+      type: String,
+      default: 'guest'
+    }
+  },
   data() {
     return {
       user: null,

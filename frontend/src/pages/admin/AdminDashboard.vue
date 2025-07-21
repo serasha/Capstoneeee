@@ -1,9 +1,32 @@
 <template>
   <div class="admin-dashboard">
-    <div class="welcome-section">
-      <h1 class="page-title">Dashboard Admin</h1>
-      <p class="page-subtitle">Selamat datang di panel administrasi SPBE</p>
-    </div>
+    <!-- Admin Landing Section -->
+    <section class="admin-landing-section">
+      <div class="admin-landing-bg">
+        <h1 class="admin-landing-title">Modul Layanan Pendaftaran<br />dan Pendataan Transmigrasi</h1>
+        <p class="admin-landing-desc">
+          Layanan Transmigrasi dari Pemerintah Kota Yogyakarta kini hadir di genggaman Anda melalui Sistem Pemerintahan Berbasis Elektronik (SPBE). Proses pendaftaran, verifikasi data, update status, hingga bantuan keberangkatan bisa diakses dengan mudah, cepat, dan transparan.
+        </p>
+        <div class="admin-landing-services">
+          <router-link to="/admin/dashboard" class="admin-service-card">
+            <span class="admin-service-icon">📝</span>
+            <span class="admin-service-label">Pendaftaran Formulir</span>
+          </router-link>
+          <router-link to="/admin/verifikasi" class="admin-service-card">
+            <span class="admin-service-icon">📑</span>
+            <span class="admin-service-label">Verifikasi Data Pendaftar</span>
+          </router-link>
+          <router-link to="/admin/update-status" class="admin-service-card">
+            <span class="admin-service-icon">🔄</span>
+            <span class="admin-service-label">Update Status Pengajuan</span>
+          </router-link>
+          <router-link to="/admin/bantuan" class="admin-service-card">
+            <span class="admin-service-icon">💬</span>
+            <span class="admin-service-label">Bantuan & Konsultasi</span>
+          </router-link>
+        </div>
+      </div>
+    </section>
 
     <!-- Stats Cards -->
     <div class="stats-grid">
@@ -236,6 +259,88 @@ export default {
 @media (max-width: 480px) {
   .actions-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Admin Landing Section Styles */
+.admin-landing-section {
+  background: linear-gradient(rgba(220,53,69,0.85), rgba(220,53,69,0.85)), url('/hero-ilustrasi.png');
+  background-size: cover;
+  background-position: center;
+  padding: 3rem 0 2rem 0;
+  color: #fff;
+  border-radius: 16px;
+  margin-bottom: 2.5rem;
+}
+.admin-landing-bg {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: left;
+  padding: 2rem 2rem 2rem 2rem;
+}
+.admin-landing-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  line-height: 1.2;
+}
+.admin-landing-desc {
+  font-size: 1.1rem;
+  margin-bottom: 2.2rem;
+  max-width: 700px;
+}
+.admin-landing-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.admin-service-card {
+  background: #fff;
+  color: #dc3545;
+  border: 2px solid #dc3545;
+  border-radius: 14px;
+  padding: 1.5rem 1.2rem;
+  min-width: 180px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 10px rgba(220,53,69,0.08);
+  transition: all 0.2s;
+}
+.admin-service-card:hover {
+  background: #dc3545;
+  color: #fff;
+  border-color: #fff;
+  transform: translateY(-2px) scale(1.04);
+}
+.admin-service-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+.admin-service-label {
+  text-align: center;
+  font-size: 1rem;
+}
+@media (max-width: 768px) {
+  .admin-landing-title {
+    font-size: 1.5rem;
+  }
+  .admin-landing-bg {
+    padding: 1rem;
+  }
+  .admin-landing-services {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .admin-service-card {
+    min-width: 100%;
+    min-height: 90px;
+    font-size: 1rem;
+    padding: 1rem 0.5rem;
   }
 }
 </style>
