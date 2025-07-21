@@ -12,4 +12,5 @@ func AdminRoutes(app *fiber.App, db *gorm.DB) {
 	app.Post("/api/admin", handlers.CreateAdmin(db))
 	app.Put("/api/admin/:id", handlers.UpdateAdmin(db))
 	app.Delete("/api/admin/:id", handlers.DeleteAdmin(db))
+	app.Get("/api/admin/dashboard-stat", handlers.StatistikDashboardAdmin(db))
 }

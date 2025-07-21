@@ -93,3 +93,25 @@ func DeleteAdmin(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
+
+// StatistikDashboardAdmin mengembalikan statistik dashboard admin
+func StatistikDashboardAdmin(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var totalUsers int64
+		var totalPendaftaran int64
+		var terverifikasi int64
+		var menunggu int64
+
+		db.Model(&models.User{}).Count(&totalUsers)
+		db.Model(&models.Pendaftaran{}).Count(&totalPendaftaran)
+		db.Model(&models.Pendaftaran{}).Where("status_pendaftar = ?", "verifikasi").Count(&terverifikasi)
+		db.Model(&models.Pendaftaran{}).Where("status_pendaftar = ?", "pending").Count(&menunggu)
+
+		return c.JSON(fiber.Map{
+			"total_users": totalUsers,
+			"total_pendaftaran": totalPendaftaran,
+			"terverifikasi": terverifikasi,
+			"menunggu": menunggu,
+		})
+	}
+}

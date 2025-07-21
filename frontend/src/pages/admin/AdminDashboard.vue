@@ -96,11 +96,25 @@ export default {
   data() {
     return {
       stats: {
-        totalUsers: 1250,
-        totalApplications: 856,
-        verifiedApplications: 642,
-        pendingApplications: 214
+        totalUsers: 0,
+        totalApplications: 0,
+        verifiedApplications: 0,
+        pendingApplications: 0
       }
+    }
+  },
+  async created() {
+    try {
+      const res = await fetch('/api/admin/dashboard-stat', { credentials: 'include' })
+      if (res.ok) {
+        const data = await res.json()
+        this.stats.totalUsers = data.total_users
+        this.stats.totalApplications = data.total_pendaftaran
+        this.stats.verifiedApplications = data.terverifikasi
+        this.stats.pendingApplications = data.menunggu
+      }
+    } catch (e) {
+      // Optional: tampilkan error
     }
   }
 }
