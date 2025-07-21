@@ -32,17 +32,6 @@
 
         <li class="nav-item">
           <router-link 
-            to="/admin/update-status" 
-            class="nav-link"
-            :class="{ active: isActiveRoute('/admin/update-status') }"
-          >
-            <i class="fas fa-sync-alt nav-icon"></i>
-            <span class="nav-text">Update Status</span>
-          </router-link>
-        </li>
-
-        <li class="nav-item">
-          <router-link 
             to="/admin/log-aktivitas" 
             class="nav-link"
             :class="{ active: isActiveRoute('/admin/log-aktivitas') }"

@@ -66,11 +66,6 @@ const routes = [
         component: AdminLogAktivitas
       },
       {
-        path: 'update-status',
-        name: 'AdminUpdateStatus',
-        component: AdminUpdateStatus
-      },
-      {
         path: 'verifikasi',
         name: 'AdminVerifikasi',
         component: AdminVerifikasi

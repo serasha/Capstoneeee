@@ -33,17 +33,7 @@
                 </div>
               </router-link>
             </div>
-            <div class="col-lg-3 col-md-4 col-sm-6">
-              <router-link to="/admin/update-status" class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow">
-                <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">
-                  <span class="service-icon" style="font-size:2.5rem;">🔄</span>
-                </div>
-                <div class="service-title text-center">
-                  <div class="title-line">Update Status</div>
-                  <div class="title-line">Pengajuan</div>
-                </div>
-              </router-link>
-            </div>
+            <!-- Hapus Update Status -->
             <div class="col-lg-3 col-md-4 col-sm-6">
               <router-link to="/admin/bantuan" class="service-card d-flex flex-column justify-content-center align-items-center p-4 rounded shadow">
                 <div class="icon-wrapper d-flex justify-content-center align-items-center rounded-circle mb-3">

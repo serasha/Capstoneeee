@@ -16,10 +16,6 @@
             <span class="admin-service-icon">📑</span>
             <span class="admin-service-label">Verifikasi Data Pendaftar</span>
           </router-link>
-          <router-link to="/admin/update-status" class="admin-service-card">
-            <span class="admin-service-icon">🔄</span>
-            <span class="admin-service-label">Update Status Pengajuan</span>
-          </router-link>
           <router-link to="/admin/bantuan" class="admin-service-card">
             <span class="admin-service-icon">💬</span>
             <span class="admin-service-label">Bantuan & Konsultasi</span>
@@ -78,11 +74,6 @@
         <router-link to="/admin/verifikasi" class="action-card">
           <i class="fas fa-check-square"></i>
           <span>Verifikasi Data</span>
-        </router-link>
-        
-        <router-link to="/admin/update-status" class="action-card">
-          <i class="fas fa-sync-alt"></i>
-          <span>Update Status</span>
         </router-link>
         
         <router-link to="/admin/log-aktivitas" class="action-card">
