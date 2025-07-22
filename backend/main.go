@@ -96,6 +96,7 @@ func main() {
 	routes.TimelineRoutes(app, database.DB)
 	routes.WawancaraRoutes(app, database.DB)
 	routes.DokumenRoutes(app, database.DB)
+	routes.HakAksesRoutes(app, database.DB)
 
 	// 📦 Serve static files (Vue build result)
 	app.Static("/", "../frontend/dist")

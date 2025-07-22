@@ -3,177 +3,384 @@
     <!-- Header Section -->
     <div class="header-section d-flex justify-content-between align-items-center mb-4">
       <h4 class="page-title mb-0">Manajemen Hak Akses</h4>
-      <div class="user-info d-flex align-items-center">
-        <div class="me-3 text-end">
-          <h6 class="mb-0 user-name">{{ userInfo.name }}</h6>
-          <small class="text-muted">{{ userInfo.id }}</small>
-        </div>
-        <img 
-          :src="userInfo.avatar" 
-          :alt="userInfo.name" 
-          class="user-avatar"
+      <div class="header-actions d-flex gap-2">
+        <button 
+          class="btn btn-success btn-sm"
+          @click="showAddModal = true"
         >
+          <i class="fas fa-plus me-2"></i>Tambah User
+        </button>
+        <button 
+          class="btn btn-outline-primary btn-sm"
+          @click="refreshData"
+          :disabled="loading"
+        >
+          <i class="fas fa-sync-alt me-2" :class="{ 'fa-spin': loading }"></i>Refresh
+        </button>
       </div>
     </div>
 
-    <!-- Access Form Section -->
-    <div class="access-form-section">
-      <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8 col-sm-10">
-          <div class="form-card">
-            <div class="card-body p-4">
-              <form @submit.prevent="submitAccess">
-                <!-- ID User Field -->
-                <div class="mb-4">
-                  <label for="idUser" class="form-label">ID User</label>
-                  <input 
-                    type="text" 
-                    id="idUser"
-                    v-model="formData.idUser"
-                    class="form-control form-control-lg"
-                    :class="{ 'is-invalid': errors.idUser }"
-                    placeholder="Masukkan ID User"
-                    @blur="validateIdUser"
-                    @input="clearError('idUser')"
+    <!-- Search and Filter Section -->
+    <div class="filter-section mb-4">
+      <div class="row">
+        <div class="col-md-4">
+          <label class="form-label">Cari Data</label>
+          <input 
+            type="text" 
+            v-model="searchQuery"
+            class="form-control"
+            placeholder="Cari berdasarkan nama, username, email..."
+            @input="filterData"
+          >
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Filter Level Akses</label>
+          <select v-model="levelFilter" @change="filterData" class="form-select">
+            <option value="">Semua Level</option>
+            <option value="Admin">Admin</option>
+            <option value="user">User</option>
+            <option value="operator">Operator</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Filter Status</label>
+          <select v-model="statusFilter" @change="filterData" class="form-select">
+            <option value="">Semua Status</option>
+            <option value="true">Aktif</option>
+            <option value="false">Nonaktif</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Show</label>
+          <select v-model="entriesPerPage" @change="updatePagination" class="form-select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-section">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 5%;">No</th>
+              <th style="width: 12%;">ID User</th>
+              <th style="width: 20%;">Nama User</th>
+              <th style="width: 15%;">Username</th>
+              <th style="width: 18%;">Email</th>
+              <th style="width: 12%;">Level Akses</th>
+              <th style="width: 8%;">Status</th>
+              <th style="width: 10%;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr 
+              v-for="(item, index) in paginatedData" 
+              :key="`${item.type}-${item.id}`"
+              class="table-row"
+            >
+              <td>{{ getRowNumber(index) }}</td>
+              <td>
+                <span class="user-id-badge" :class="getUserIdBadgeClass(item.type)">
+                  {{ item.id_user }}
+                </span>
+              </td>
+              <td>
+                <div class="user-name-cell">
+                  <strong>{{ item.nama_user }}</strong>
+                  <small class="text-muted d-block">{{ item.type === 'admin' ? 'Administrator' : 'Regular User' }}</small>
+                </div>
+              </td>
+              <td>{{ item.username }}</td>
+              <td>{{ item.email || '-' }}</td>
+              <td>
+                <span 
+                  class="badge level-badge"
+                  :class="getLevelBadgeClass(item.level_akses)"
+                >
+                  {{ item.level_akses }}
+                </span>
+              </td>
+              <td>
+                <div class="status-cell">
+                  <span 
+                    class="badge status-badge"
+                    :class="item.status_aktif ? 'bg-success' : 'bg-secondary'"
                   >
-                  <div v-if="errors.idUser" class="invalid-feedback">
-                    {{ errors.idUser }}
-                  </div>
-                </div>
-
-                <!-- Nama User Field -->
-                <div class="mb-4">
-                  <label for="namaUser" class="form-label">Nama User</label>
-                  <input 
-                    type="text" 
-                    id="namaUser"
-                    v-model="formData.namaUser"
-                    class="form-control form-control-lg"
-                    :class="{ 'is-invalid': errors.namaUser }"
-                    placeholder="Masukkan Nama User"
-                    @blur="validateNamaUser"
-                    @input="clearError('namaUser')"
-                  >
-                  <div v-if="errors.namaUser" class="invalid-feedback">
-                    {{ errors.namaUser }}
-                  </div>
-                </div>
-
-                <!-- Pilih Akses Field -->
-                <div class="mb-4">
-                  <label for="pilihAkses" class="form-label">Pilih Akses</label>
-                  <div class="dropdown-container">
-                    <select 
-                      id="pilihAkses"
-                      v-model="formData.pilihAkses"
-                      class="form-select form-select-lg"
-                      :class="{ 'is-invalid': errors.pilihAkses }"
-                      @change="validatePilihAkses"
-                    >
-                      <option value="">Pilih Level Akses</option>
-                      <option 
-                        v-for="akses in aksesOptions" 
-                        :key="akses.value" 
-                        :value="akses.value"
-                      >
-                        {{ akses.label }}
-                      </option>
-                    </select>
-                    <div v-if="errors.pilihAkses" class="invalid-feedback">
-                      {{ errors.pilihAkses }}
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="text-center">
+                    {{ item.status_aktif ? 'Aktif' : 'Nonaktif' }}
+                  </span>
                   <button 
-                    type="submit" 
-                    class="btn btn-danger btn-lg px-5"
-                    :disabled="isSubmitting"
+                    v-if="item.type === 'admin'"
+                    class="btn btn-sm btn-outline-secondary ms-1"
+                    @click="toggleStatus(item)"
+                    :disabled="loading"
+                    title="Toggle Status"
                   >
-                    <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-                    {{ isSubmitting ? 'Menyimpan...' : 'SIMPAN AKSES' }}
+                    <i class="fas fa-toggle-on" v-if="item.status_aktif"></i>
+                    <i class="fas fa-toggle-off" v-else></i>
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button 
+                    class="btn btn-outline-primary"
+                    @click="editItem(item)"
+                    title="Edit"
+                    :disabled="loading"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button 
+                    class="btn btn-outline-danger"
+                    @click="deleteItem(item)"
+                    title="Hapus"
+                    :disabled="loading"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div v-if="!loading && filteredData.length === 0" class="empty-state text-center py-5">
+        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">Tidak ada data ditemukan</h5>
+        <p class="text-muted">Coba ubah filter pencarian atau tambah user baru</p>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="loading" class="loading-state text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
+        <p class="text-muted mt-2">Memuat data...</p>
       </div>
     </div>
 
-    <!-- Recent Access List -->
-    <div class="recent-access-section mt-5">
-      <div class="row">
-        <div class="col-12">
-          <div class="access-list-card">
-            <div class="card-header bg-light">
-              <h5 class="mb-0">Daftar Hak Akses Terbaru</h5>
-            </div>
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th>No</th>
-                      <th>ID User</th>
-                      <th>Nama User</th>
-                      <th>Level Akses</th>
-                      <th>Tanggal Dibuat</th>
-                      <th>Status</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr 
-                      v-for="(access, index) in recentAccess" 
-                      :key="access.id"
-                    >
-                      <td>{{ index + 1 }}</td>
-                      <td class="user-id">{{ access.idUser }}</td>
-                      <td>{{ access.namaUser }}</td>
-                      <td>
-                        <span 
-                          class="badge"
-                          :class="getAccessBadgeClass(access.levelAkses)"
-                        >
-                          {{ access.levelAkses }}
-                        </span>
-                      </td>
-                      <td>{{ formatDate(access.tanggalDibuat) }}</td>
-                      <td>
-                        <span 
-                          class="badge"
-                          :class="access.status === 'Aktif' ? 'bg-success' : 'bg-secondary'"
-                        >
-                          {{ access.status }}
-                        </span>
-                      </td>
-                      <td>
-                        <div class="btn-group btn-group-sm">
-                          <button 
-                            class="btn btn-outline-primary btn-sm"
-                            @click="editAccess(access)"
-                            title="Edit"
-                          >
-                            <i class="fas fa-edit"></i>
-                          </button>
-                          <button 
-                            class="btn btn-outline-danger btn-sm"
-                            @click="deleteAccess(access.id)"
-                            title="Hapus"
-                          >
-                            <i class="fas fa-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+    <!-- Pagination -->
+    <div class="pagination-section d-flex justify-content-between align-items-center mt-4">
+      <div class="pagination-info">
+        <span class="text-muted">
+          Menampilkan {{ getStartRecord() }} sampai {{ getEndRecord() }} dari {{ filteredData.length }} data
+        </span>
+      </div>
+      <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <button 
+              class="page-link" 
+              @click="previousPage"
+              :disabled="currentPage === 1"
+            >
+              &laquo;
+            </button>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <button 
+              class="page-link" 
+              @click="previousPage"
+              :disabled="currentPage === 1"
+            >
+              &lt;
+            </button>
+          </li>
+          <li 
+            v-for="page in visiblePages" 
+            :key="page"
+            class="page-item"
+            :class="{ active: page === currentPage }"
+          >
+            <button 
+              class="page-link" 
+              @click="goToPage(page)"
+              v-if="page !== '...'"
+            >
+              {{ page }}
+            </button>
+            <span class="page-link" v-else>...</span>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <button 
+              class="page-link" 
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
+            >
+              &gt;
+            </button>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <button 
+              class="page-link" 
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
+            >
+              &raquo;
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div v-if="showAddModal || showEditModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ showAddModal ? 'Tambah User Baru' : 'Edit User' }}
+          </h5>
+          <button class="btn-close" @click="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="submitForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label required">Nama User</label>
+                  <input
+                    type="text"
+                    v-model="formData.nama_user"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.nama_user }"
+                    placeholder="Masukkan nama lengkap"
+                    required
+                  />
+                  <div v-if="errors.nama_user" class="invalid-feedback">
+                    {{ errors.nama_user }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label required">Username</label>
+                  <input
+                    type="text"
+                    v-model="formData.username"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.username }"
+                    placeholder="Masukkan username"
+                    required
+                  />
+                  <div v-if="errors.username" class="invalid-feedback">
+                    {{ errors.username }}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label">Email</label>
+                  <input
+                    type="email"
+                    v-model="formData.email"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.email }"
+                    placeholder="Masukkan email (opsional untuk user)"
+                  />
+                  <div v-if="errors.email" class="invalid-feedback">
+                    {{ errors.email }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label required">Level Akses</label>
+                  <select
+                    v-model="formData.level_akses"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.level_akses }"
+                    required
+                  >
+                    <option value="">Pilih Level Akses</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                    <option value="operator">Operator</option>
+                  </select>
+                  <div v-if="errors.level_akses" class="invalid-feedback">
+                    {{ errors.level_akses }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" v-if="showAddModal">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label required">Password</label>
+                  <input
+                    type="password"
+                    v-model="formData.password"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.password }"
+                    placeholder="Masukkan password"
+                    required
+                  />
+                  <div v-if="errors.password" class="invalid-feedback">
+                    {{ errors.password }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label required">Konfirmasi Password</label>
+                  <input
+                    type="password"
+                    v-model="formData.confirm_password"
+                    class="form-control"
+                    :class="{ 'is-invalid': errors.confirm_password }"
+                    placeholder="Konfirmasi password"
+                    required
+                  />
+                  <div v-if="errors.confirm_password" class="invalid-feedback">
+                    {{ errors.confirm_password }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" v-if="formData.level_akses === 'admin'">
+              <div class="col-12">
+                <div class="form-group mb-3">
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      id="statusAktif"
+                      v-model="formData.status_aktif"
+                      class="form-check-input"
+                    />
+                    <label class="form-check-label" for="statusAktif">
+                      Status Aktif
+                    </label>
+                  </div>
+                  <small class="text-muted">Admin yang tidak aktif tidak dapat login ke sistem</small>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="closeModal" :disabled="isSubmitting">
+            Batal
+          </button>
+          <button 
+            class="btn btn-primary" 
+            @click="submitForm"
+            :disabled="isSubmitting"
+          >
+            <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ showAddModal ? 'Tambah' : 'Update' }}
+          </button>
         </div>
       </div>
     </div>
@@ -181,9 +388,11 @@
     <!-- Success/Error Messages -->
     <div 
       v-if="message.show" 
-      class="alert alert-dismissible fade show mt-3"
+      class="alert alert-dismissible fade show position-fixed"
       :class="message.type === 'success' ? 'alert-success' : 'alert-danger'"
+      style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;"
     >
+      <i :class="message.type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'" class="me-2"></i>
       {{ message.text }}
       <button 
         type="button" 
@@ -199,171 +408,363 @@ export default {
   name: 'HakAkses',
   data() {
     return {
-      userInfo: {
-        name: 'Hendra Hermawan',
-        id: '190001290',
-        avatar: 'https://via.placeholder.com/50x50/007bff/ffffff?text=HH'
-      },
-      formData: {
-        idUser: '',
-        namaUser: '',
-        pilihAkses: ''
-      },
-      errors: {},
+      loading: false,
+      searchQuery: '',
+      levelFilter: '',
+      statusFilter: '',
+      entriesPerPage: 10,
+      currentPage: 1,
+      showAddModal: false,
+      showEditModal: false,
       isSubmitting: false,
+      editingItem: null,
+      
+      formData: {
+        nama_user: '',
+        username: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        level_akses: '',
+        status_aktif: true
+      },
+      
+      errors: {},
+      
       message: {
         show: false,
         type: 'success',
         text: ''
       },
-      aksesOptions: [
-        { value: 'super_admin', label: 'Super Admin' },
-        { value: 'admin', label: 'Admin' },
-        { value: 'operator', label: 'Operator' },
-        { value: 'user', label: 'User' },
-        { value: 'guest', label: 'Guest' }
-      ],
-      recentAccess: [
-        {
-          id: 1,
-          idUser: '190001290',
-          namaUser: 'Hendra Hermawan',
-          levelAkses: 'Super Admin',
-          tanggalDibuat: new Date('2025-01-15'),
-          status: 'Aktif'
-        },
-        {
-          id: 2,
-          idUser: '190001291',
-          namaUser: 'Ahmad Rizki',
-          levelAkses: 'Admin',
-          tanggalDibuat: new Date('2025-01-14'),
-          status: 'Aktif'
-        },
-        {
-          id: 3,
-          idUser: '190001292',
-          namaUser: 'Siti Nurhaliza',
-          levelAkses: 'Operator',
-          tanggalDibuat: new Date('2025-01-13'),
-          status: 'Aktif'
-        },
-        {
-          id: 4,
-          idUser: '190001293',
-          namaUser: 'Budi Santoso',
-          levelAkses: 'User',
-          tanggalDibuat: new Date('2025-01-12'),
-          status: 'Nonaktif'
-        }
-      ]
+      
+      hakAksesData: [],
+      filteredData: []
     }
   },
+  
+  computed: {
+    totalPages() {
+      return Math.ceil(this.filteredData.length / this.entriesPerPage)
+    },
+    
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.entriesPerPage
+      const end = start + this.entriesPerPage
+      return this.filteredData.slice(start, end)
+    },
+    
+    visiblePages() {
+      const pages = []
+      const total = this.totalPages
+      const current = this.currentPage
+      
+      if (total <= 7) {
+        for (let i = 1; i <= total; i++) {
+          pages.push(i)
+        }
+      } else {
+        if (current <= 4) {
+          for (let i = 1; i <= 5; i++) {
+            pages.push(i)
+          }
+          pages.push('...')
+          pages.push(total)
+        } else if (current >= total - 3) {
+          pages.push(1)
+          pages.push('...')
+          for (let i = total - 4; i <= total; i++) {
+            pages.push(i)
+          }
+        } else {
+          pages.push(1)
+          pages.push('...')
+          for (let i = current - 1; i <= current + 1; i++) {
+            pages.push(i)
+          }
+          pages.push('...')
+          pages.push(total)
+        }
+      }
+      
+      return pages
+    }
+  },
+  
+  async created() {
+    await this.fetchData()
+  },
+  
   methods: {
-    validateIdUser() {
-      if (!this.formData.idUser.trim()) {
-        this.errors.idUser = 'ID User harus diisi'
-      } else if (this.formData.idUser.length < 5) {
-        this.errors.idUser = 'ID User minimal 5 karakter'
+    async fetchData() {
+      this.loading = true
+      try {
+        const response = await fetch('/api/hak-akses', {
+          credentials: 'include'
+        })
+        
+        if (!response.ok) {
+          throw new Error('Gagal mengambil data')
+        }
+        
+        this.hakAksesData = await response.json()
+        this.filterData()
+      } catch (error) {
+        this.showMessage('error', 'Gagal mengambil data: ' + error.message)
+      } finally {
+        this.loading = false
       }
     },
-    validateNamaUser() {
-      if (!this.formData.namaUser.trim()) {
-        this.errors.namaUser = 'Nama User harus diisi'
-      } else if (this.formData.namaUser.length < 3) {
-        this.errors.namaUser = 'Nama User minimal 3 karakter'
+    
+    filterData() {
+      let filtered = [...this.hakAksesData]
+      
+      // Filter berdasarkan search query
+      if (this.searchQuery.trim()) {
+        const query = this.searchQuery.toLowerCase()
+        filtered = filtered.filter(item => 
+          item.nama_user.toLowerCase().includes(query) ||
+          item.username.toLowerCase().includes(query) ||
+          (item.email && item.email.toLowerCase().includes(query)) ||
+          item.id_user.toLowerCase().includes(query)
+        )
+      }
+      
+      // Filter berdasarkan level akses
+      if (this.levelFilter) {
+        filtered = filtered.filter(item => 
+          item.level_akses.toLowerCase() === this.levelFilter.toLowerCase()
+        )
+      }
+      
+      // Filter berdasarkan status
+      if (this.statusFilter !== '') {
+        const isActive = this.statusFilter === 'true'
+        filtered = filtered.filter(item => item.status_aktif === isActive)
+      }
+      
+      this.filteredData = filtered
+      this.currentPage = 1
+    },
+    
+    updatePagination() {
+      this.currentPage = 1
+    },
+    
+    getRowNumber(index) {
+      return (this.currentPage - 1) * this.entriesPerPage + index + 1
+    },
+    
+    getStartRecord() {
+      return this.filteredData.length === 0 ? 0 : (this.currentPage - 1) * this.entriesPerPage + 1
+    },
+    
+    getEndRecord() {
+      const end = this.currentPage * this.entriesPerPage
+      return Math.min(end, this.filteredData.length)
+    },
+    
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--
       }
     },
-    validatePilihAkses() {
-      if (!this.formData.pilihAkses) {
-        this.errors.pilihAkses = 'Level akses harus dipilih'
+    
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++
       }
     },
-    clearError(field) {
-      if (this.errors[field]) {
-        delete this.errors[field]
+    
+    goToPage(page) {
+      if (page !== '...' && page >= 1 && page <= this.totalPages) {
+        this.currentPage = page
       }
     },
+    
+    getUserIdBadgeClass(type) {
+      return {
+        'badge-admin': type === 'admin',
+        'badge-user': type === 'user'
+      }
+    },
+    
+    getLevelBadgeClass(level) {
+      const classes = {
+        'Admin': 'bg-danger',
+        'admin': 'bg-danger',
+        'user': 'bg-primary',
+        'operator': 'bg-warning text-dark'
+      }
+      return classes[level] || 'bg-secondary'
+    },
+    
+    editItem(item) {
+      this.editingItem = item
+      this.formData = {
+        nama_user: item.nama_user,
+        username: item.username,
+        email: item.email || '',
+        password: '',
+        confirm_password: '',
+        level_akses: item.level_akses.toLowerCase(),
+        status_aktif: item.status_aktif
+      }
+      this.showEditModal = true
+      this.errors = {}
+    },
+    
+    async deleteItem(item) {
+      if (!confirm(`Apakah Anda yakin ingin menghapus ${item.nama_user}?`)) {
+        return
+      }
+      
+      this.loading = true
+      try {
+        const response = await fetch(`/api/hak-akses/${item.id}?type=${item.type}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Gagal menghapus data')
+        }
+        
+        this.showMessage('success', `${item.nama_user} berhasil dihapus`)
+        await this.fetchData()
+      } catch (error) {
+        this.showMessage('error', error.message)
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    async toggleStatus(item) {
+      if (item.type !== 'admin') {
+        this.showMessage('error', 'Hanya admin yang memiliki status aktif/nonaktif')
+        return
+      }
+      
+      this.loading = true
+      try {
+        const response = await fetch(`/api/hak-akses/${item.id}/toggle-status?type=${item.type}`, {
+          method: 'PATCH',
+          credentials: 'include'
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Gagal mengubah status')
+        }
+        
+        const result = await response.json()
+        this.showMessage('success', result.message)
+        await this.fetchData()
+      } catch (error) {
+        this.showMessage('error', error.message)
+      } finally {
+        this.loading = false
+      }
+    },
+    
     validateForm() {
       this.errors = {}
-      this.validateIdUser()
-      this.validateNamaUser()
-      this.validatePilihAkses()
+      
+      if (!this.formData.nama_user.trim()) {
+        this.errors.nama_user = 'Nama user wajib diisi'
+      }
+      
+      if (!this.formData.username.trim()) {
+        this.errors.username = 'Username wajib diisi'
+      } else if (this.formData.username.length < 3) {
+        this.errors.username = 'Username minimal 3 karakter'
+      }
+      
+      if (this.formData.level_akses === 'admin' && !this.formData.email.trim()) {
+        this.errors.email = 'Email wajib diisi untuk admin'
+      }
+      
+      if (!this.formData.level_akses) {
+        this.errors.level_akses = 'Level akses wajib dipilih'
+      }
+      
+      if (this.showAddModal) {
+        if (!this.formData.password) {
+          this.errors.password = 'Password wajib diisi'
+        } else if (this.formData.password.length < 6) {
+          this.errors.password = 'Password minimal 6 karakter'
+        }
+        
+        if (!this.formData.confirm_password) {
+          this.errors.confirm_password = 'Konfirmasi password wajib diisi'
+        } else if (this.formData.password !== this.formData.confirm_password) {
+          this.errors.confirm_password = 'Password tidak cocok'
+        }
+      }
+      
       return Object.keys(this.errors).length === 0
     },
-    async submitAccess() {
+    
+    async submitForm() {
       if (!this.validateForm()) {
         return
       }
-
+      
       this.isSubmitting = true
       
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500))
+        const url = this.showAddModal 
+          ? '/api/hak-akses' 
+          : `/api/hak-akses/${this.editingItem.id}?type=${this.editingItem.type}`
         
-        // Add to recent access
-        const newAccess = {
-          id: this.recentAccess.length + 1,
-          idUser: this.formData.idUser,
-          namaUser: this.formData.namaUser,
-          levelAkses: this.aksesOptions.find(opt => opt.value === this.formData.pilihAkses)?.label,
-          tanggalDibuat: new Date(),
-          status: 'Aktif'
+        const method = this.showAddModal ? 'POST' : 'PUT'
+        
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(this.formData)
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Gagal menyimpan data')
         }
         
-        this.recentAccess.unshift(newAccess)
-        
-        // Reset form
-        this.formData = {
-          idUser: '',
-          namaUser: '',
-          pilihAkses: ''
-        }
-        
-        this.showMessage('success', 'Hak akses berhasil disimpan!')
-        
+        const result = await response.json()
+        this.showMessage('success', result.message)
+        this.closeModal()
+        await this.fetchData()
       } catch (error) {
-        this.showMessage('error', 'Terjadi kesalahan saat menyimpan data')
+        this.showMessage('error', error.message)
       } finally {
         this.isSubmitting = false
       }
     },
-    editAccess(access) {
+    
+    closeModal() {
+      this.showAddModal = false
+      this.showEditModal = false
+      this.editingItem = null
       this.formData = {
-        idUser: access.idUser,
-        namaUser: access.namaUser,
-        pilihAkses: this.aksesOptions.find(opt => opt.label === access.levelAkses)?.value || ''
+        nama_user: '',
+        username: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        level_akses: '',
+        status_aktif: true
       }
-      
-      // Scroll to form
-      document.querySelector('.form-card').scrollIntoView({ 
-        behavior: 'smooth' 
-      })
+      this.errors = {}
     },
-    async deleteAccess(id) {
-      if (confirm('Apakah Anda yakin ingin menghapus hak akses ini?')) {
-        this.recentAccess = this.recentAccess.filter(access => access.id !== id)
-        this.showMessage('success', 'Hak akses berhasil dihapus!')
-      }
+    
+    async refreshData() {
+      await this.fetchData()
+      this.showMessage('success', 'Data berhasil diperbarui')
     },
-    getAccessBadgeClass(levelAkses) {
-      const badgeClasses = {
-        'Super Admin': 'bg-danger',
-        'Admin': 'bg-warning text-dark',
-        'Operator': 'bg-info',
-        'User': 'bg-success',
-        'Guest': 'bg-secondary'
-      }
-      return badgeClasses[levelAkses] || 'bg-secondary'
-    },
-    formatDate(date) {
-      return new Intl.DateTimeFormat('id-ID', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      }).format(date)
-    },
+    
     showMessage(type, text) {
       this.message = {
         show: true,
@@ -397,106 +798,51 @@ export default {
 .page-title {
   color: #333;
   font-weight: 600;
+  font-size: 1.5rem;
 }
 
-.user-info {
-  background: rgba(0,123,255,0.1);
-  padding: 8px 16px;
-  border-radius: 25px;
-  border: 1px solid rgba(0,123,255,0.2);
+.header-actions .btn {
+  font-weight: 500;
 }
 
-.user-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #007bff;
-}
-
-.user-name {
-  color: #333;
-  font-weight: 600;
-}
-
-.access-form-section {
-  margin-top: 32px;
-}
-
-.form-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: none;
-  overflow: hidden;
+.filter-section {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  border: 1px solid #e9ecef;
 }
 
 .form-label {
   font-weight: 600;
   color: #333;
   margin-bottom: 8px;
+  font-size: 0.9rem;
 }
 
-.form-control-lg, .form-select-lg {
+.form-control, .form-select {
   border: 2px solid #e9ecef;
   border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 1rem;
+  padding: 10px 12px;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
 }
 
-.form-control-lg:focus, .form-select-lg:focus {
+.form-control:focus, .form-select:focus {
   border-color: #007bff;
   box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
 }
 
-.form-control-lg.is-invalid, .form-select-lg.is-invalid {
-  border-color: #dc3545;
-}
-
-.dropdown-container {
-  position: relative;
-}
-
-.btn-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 32px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(220,53,69,0.3);
-}
-
-.btn-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220,53,69,0.4);
-}
-
-.btn-danger:disabled {
-  opacity: 0.6;
-  transform: none;
-  box-shadow: none;
-}
-
-.recent-access-section {
-  background: #fff;
+.table-section {
+  background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  border: 1px solid #e9ecef;
   overflow: hidden;
 }
 
-.access-list-card {
-  border: none;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.card-header {
-  border-bottom: 2px solid #e9ecef;
-  padding: 16px 24px;
+.table {
+  margin-bottom: 0;
 }
 
 .table th {
@@ -504,27 +850,61 @@ export default {
   border-color: #dee2e6;
   font-weight: 600;
   color: #495057;
-  padding: 12px 16px;
+  padding: 16px 12px;
   border-top: none;
+  font-size: 0.9rem;
 }
 
 .table td {
-  padding: 12px 16px;
+  padding: 16px 12px;
   vertical-align: middle;
   border-color: #dee2e6;
+  font-size: 0.9rem;
 }
 
-.table tbody tr:hover {
+.table-row:hover {
   background-color: rgba(0,123,255,0.05);
 }
 
-.user-id {
+.user-id-badge {
   font-family: 'Courier New', monospace;
-  font-weight: 500;
-  color: #007bff;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
 }
 
-.badge {
+.badge-admin {
+  background-color: #dc3545;
+}
+
+.badge-user {
+  background-color: #007bff;
+}
+
+.user-name-cell strong {
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.user-name-cell small {
+  font-size: 0.75rem;
+}
+
+.level-badge {
+  font-size: 0.8em;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
   font-size: 0.8em;
   padding: 6px 12px;
   border-radius: 20px;
@@ -532,24 +912,148 @@ export default {
 }
 
 .btn-group-sm .btn {
-  padding: 4px 8px;
-  font-size: 0.8em;
+  padding: 6px 10px;
+  font-size: 0.8rem;
   border-radius: 4px;
 }
 
-.btn-outline-primary:hover {
-  transform: scale(1.05);
+.empty-state, .loading-state {
+  padding: 60px 20px;
 }
 
-.btn-outline-danger:hover {
-  transform: scale(1.05);
+.pagination-section {
+  background: white;
+  padding: 20px 24px;
+  border-top: 1px solid #e9ecef;
 }
 
-.alert {
-  border-radius: 8px;
+.pagination-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.pagination .page-link {
+  color: #007bff;
+  border-color: #dee2e6;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.btn-close {
+  background: none;
   border: none;
-  padding: 16px 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label.required::after {
+  content: ' *';
+  color: #dc3545;
+}
+
+.form-control.is-invalid, .form-select.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 4px;
+}
+
+.form-check-input:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.form-check-label {
   font-weight: 500;
+  color: #333;
+}
+
+/* Alert Styles */
+.alert {
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .alert-success {
@@ -560,12 +1064,6 @@ export default {
 .alert-danger {
   background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
   color: #721c24;
-}
-
-/* Loading Animation */
-.spinner-border-sm {
-  width: 1rem;
-  height: 1rem;
 }
 
 /* Responsive Design */
@@ -580,55 +1078,90 @@ export default {
     gap: 16px;
   }
   
-  .user-info {
-    align-self: flex-end;
-  }
-  
-  .form-card .card-body {
-    padding: 24px 16px;
-  }
-  
-  .btn-danger {
+  .header-actions {
     width: 100%;
-    padding: 14px;
+    justify-content: flex-end;
+  }
+  
+  .filter-section .row > div {
+    margin-bottom: 16px;
   }
   
   .table-responsive {
-    font-size: 0.9em;
+    font-size: 0.8rem;
   }
   
   .table th, .table td {
-    padding: 8px 12px;
+    padding: 12px 8px;
+  }
+  
+  .pagination-section {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .modal-body .row > div {
+    margin-bottom: 12px;
   }
 }
 
 @media (max-width: 576px) {
-  .page-title {
-    font-size: 1.2rem;
-  }
-  
-  .user-info {
+  .btn-group-sm {
     flex-direction: column;
-    text-align: center;
-    padding: 12px;
-  }
-  
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .form-control-lg, .form-select-lg {
-    padding: 10px 12px;
-  }
-  
-  .table {
-    font-size: 0.8em;
+    gap: 4px;
   }
   
   .btn-group-sm .btn {
-    padding: 2px 6px;
-    font-size: 0.7em;
+    width: 100%;
   }
+  
+  .status-cell {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .user-id-badge {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+  
+  .level-badge, .status-badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+}
+
+/* Loading Animation */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Smooth Transitions */
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.btn {
+  transition: all 0.2s ease;
+}
+
+.form-control, .form-select {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 </style>
