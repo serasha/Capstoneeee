@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"my-app/backend/models"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
-	"my-app/backend/models"
-	"time"
 )
 
 // GetWawancaraByPendaftaran mengambil data wawancara berdasarkan ID pendaftaran
@@ -109,7 +109,7 @@ func UpdateHasilWawancara(db *gorm.DB) fiber.Handler {
 func GetAllWawancara(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var wawancaras []models.Wawancara
-		
+
 		if err := db.Preload("Pendaftaran").Preload("Admin").Find(&wawancaras).Error; err != nil {
 			return c.Status(500).JSON(fiber.Map{
 				"error": "Gagal mengambil data wawancara",

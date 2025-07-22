@@ -13,7 +13,7 @@ var DB *gorm.DB
 func ConnectDB() {
     dbType := os.Getenv("DB_TYPE")
     if dbType == "" {
-        dbType = "sqlite" // default to sqlite
+        dbType = "postgres" // default to postgres
     }
 
     var db *gorm.DB
