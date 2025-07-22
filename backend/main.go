@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
 
 	"my-app/backend/database"
@@ -24,6 +26,11 @@ type App struct {
 }
 
 func main() {
+	// Load environment variables
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using default values")
+	}
+
 	// 🔌 Koneksi database
 	database.ConnectDB()
 
