@@ -51,6 +51,17 @@
             <span class="nav-text">Hak Akses</span>
           </router-link>
         </li>
+
+        <li class="nav-item">
+          <router-link 
+            to="/admin/master-kota" 
+            class="nav-link"
+            :class="{ active: isActiveRoute('/admin/master-kota') }"
+          >
+            <i class="fas fa-map-marker-alt nav-icon"></i>
+            <span class="nav-text">Master Kota</span>
+          </router-link>
+        </li>
       </ul>
     </nav>
 

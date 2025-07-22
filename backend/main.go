@@ -51,6 +51,10 @@ func main() {
 		&models.SuperAdmin{},
 		&models.User{},
 		&models.LogAktifitas{},
+		&models.Kota{},
+		&models.Dokumen{},
+		&models.Timeline{},
+		&models.Wawancara{},
 	)
 	if err != nil {
 		log.Fatal("Migrasi gagal:", err)
@@ -78,6 +82,10 @@ func main() {
 	routes.PendaftaranRoutes(api, database.DB)
 	routes.LogAktifitasRoutes(api, database.DB)
 	routes.AdminRoutes(app, database.DB)
+	routes.KotaRoutes(app, database.DB)
+	routes.TimelineRoutes(app, database.DB)
+	routes.WawancaraRoutes(app, database.DB)
+	routes.DokumenRoutes(app, database.DB)
 
 	// 📦 Serve static files (Vue build result)
 	app.Static("/", "../frontend/dist")

@@ -62,9 +62,8 @@
                 <button 
                   class="btn-verifikasi"
                   @click="verifikasiData(item)"
-                  :disabled="item.isVerified"
                 >
-                  {{ item.isVerified ? 'Terverifikasi' : 'Verifikasi' }}
+                  <i class="fas fa-check me-1"></i>Verifikasi
                 </button>
               </td>
             </tr>

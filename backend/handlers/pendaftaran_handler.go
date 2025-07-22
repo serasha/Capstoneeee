@@ -7,6 +7,7 @@ import (
 	"my-app/backend/models"
 	"time"
 	"github.com/go-playground/validator/v10"
+	"fmt"
 )
 
 // GetAllPendaftaran mengambil semua data pendaftaran dari database
@@ -87,6 +88,8 @@ func CreatePendaftaran(db *gorm.DB) fiber.Handler {
 			})
 		}
 
+		// Buat timeline awal
+		CreateTimeline(db, input.ID, "pendaftaran", "completed", "Pendaftaran berhasil dibuat")
 		return c.Status(201).JSON(input)
 	}
 }
@@ -203,11 +206,37 @@ func VerifikasiPendaftaran(db *gorm.DB) fiber.Handler {
 			action := "Verifikasi"
 			if input.StatusPendaftar == "ditolak" {
 				action = "Tolak"
+			} else if input.StatusPendaftar == "dikembalikan" {
+				action = "Kembalikan"
 			}
 			deskripsi := "Pendaftaran ID: " + id
 			_ = CreateLogAktifitas(db, adminID, action, "Pendaftaran", deskripsi)
 		}
 
+		// Update timeline
+		var timelineStatus, keterangan string
+		switch input.StatusPendaftar {
+		case "verifikasi":
+			timelineStatus = "completed"
+			keterangan = "Dokumen telah diverifikasi dan disetujui"
+		case "ditolak":
+			timelineStatus = "rejected"
+			keterangan = "Pendaftaran ditolak"
+		case "dikembalikan":
+			timelineStatus = "pending"
+			keterangan = "Dokumen dikembalikan untuk diperbaiki"
+		default:
+			timelineStatus = "pending"
+			keterangan = "Status diupdate"
+		}
+		
+		CreateTimeline(db, uint(parseUintFromString(id)), "verifikasi_dokumen", timelineStatus, keterangan)
 		return c.JSON(pendaftaran)
 	}
+}
+
+func parseUintFromString(s string) uint64 {
+	var result uint64
+	fmt.Sscanf(s, "%d", &result)
+	return result
 }

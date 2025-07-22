@@ -232,28 +232,104 @@
           </div>
           <div class="col-12">
             <label class="form-label required">Upload Dokumen (Fotocopy: KTP, KK, Buku Nikah)</label>
-            <div class="upload-area" @click="triggerFileUpload" @dragover.prevent @drop.prevent="handleFileDrop">
-              <input 
-                type="file" 
-                ref="fileInput" 
-                class="d-none" 
-                multiple 
-                accept=".pdf,.jpg,.jpeg,.png"
-                @change="handleFileUpload"
-              >
-              <div class="upload-content">
-                <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                <p class="upload-text mb-0">
-                  {{ uploadedFiles.length > 0 ? `${uploadedFiles.length} file(s) selected` : 'Click to upload or drag files here' }}
-                </p>
+            
+            <!-- Upload KTP -->
+            <div class="document-upload-section mb-3">
+              <label class="document-label">KTP (Kartu Tanda Penduduk)</label>
+              <div class="upload-area" @click="triggerFileUpload('ktp')" @dragover.prevent @drop.prevent="handleFileDrop($event, 'ktp')">
+                <input 
+                  type="file" 
+                  ref="ktpInput" 
+                  class="d-none" 
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  @change="handleFileUpload($event, 'ktp')"
+                >
+                <div class="upload-content">
+                  <i class="fas fa-id-card upload-icon"></i>
+                  <p class="upload-text mb-0">
+                    {{ uploadedFiles.ktp ? uploadedFiles.ktp.name : 'Upload KTP' }}
+                  </p>
+                </div>
               </div>
             </div>
-            <div v-if="uploadedFiles.length > 0" class="uploaded-files mt-2">
-              <div v-for="(file, index) in uploadedFiles" :key="index" class="uploaded-file">
-                <span>{{ file.name }}</span>
-                <button type="button" class="btn btn-sm btn-outline-danger" @click="removeFile(index)">
-                  <i class="fas fa-times"></i>
-                </button>
+
+            <!-- Upload KK -->
+            <div class="document-upload-section mb-3">
+              <label class="document-label">KK (Kartu Keluarga)</label>
+              <div class="upload-area" @click="triggerFileUpload('kk')" @dragover.prevent @drop.prevent="handleFileDrop($event, 'kk')">
+                <input 
+                  type="file" 
+                  ref="kkInput" 
+                  class="d-none" 
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  @change="handleFileUpload($event, 'kk')"
+                >
+                <div class="upload-content">
+                  <i class="fas fa-users upload-icon"></i>
+                  <p class="upload-text mb-0">
+                    {{ uploadedFiles.kk ? uploadedFiles.kk.name : 'Upload KK' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Surat Nikah -->
+            <div class="document-upload-section mb-3">
+              <label class="document-label">Surat Nikah</label>
+              <div class="upload-area" @click="triggerFileUpload('surat_nikah')" @dragover.prevent @drop.prevent="handleFileDrop($event, 'surat_nikah')">
+                <input 
+                  type="file" 
+                  ref="suratNikahInput" 
+                  class="d-none" 
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  @change="handleFileUpload($event, 'surat_nikah')"
+                >
+                <div class="upload-content">
+                  <i class="fas fa-heart upload-icon"></i>
+                  <p class="upload-text mb-0">
+                    {{ uploadedFiles.surat_nikah ? uploadedFiles.surat_nikah.name : 'Upload Surat Nikah' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Ijazah -->
+            <div class="document-upload-section mb-3">
+              <label class="document-label">Ijazah</label>
+              <div class="upload-area" @click="triggerFileUpload('ijazah')" @dragover.prevent @drop.prevent="handleFileDrop($event, 'ijazah')">
+                <input 
+                  type="file" 
+                  ref="ijazahInput" 
+                  class="d-none" 
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  @change="handleFileUpload($event, 'ijazah')"
+                >
+                <div class="upload-content">
+                  <i class="fas fa-graduation-cap upload-icon"></i>
+                  <p class="upload-text mb-0">
+                    {{ uploadedFiles.ijazah ? uploadedFiles.ijazah.name : 'Upload Ijazah' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Pas Foto -->
+            <div class="document-upload-section mb-3">
+              <label class="document-label">Pas Foto</label>
+              <div class="upload-area" @click="triggerFileUpload('pas_foto')" @dragover.prevent @drop.prevent="handleFileDrop($event, 'pas_foto')">
+                <input 
+                  type="file" 
+                  ref="pasFotoInput" 
+                  class="d-none" 
+                  accept=".jpg,.jpeg,.png"
+                  @change="handleFileUpload($event, 'pas_foto')"
+                >
+                <div class="upload-content">
+                  <i class="fas fa-camera upload-icon"></i>
+                  <p class="upload-text mb-0">
+                    {{ uploadedFiles.pas_foto ? uploadedFiles.pas_foto.name : 'Upload Pas Foto' }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -269,12 +345,16 @@
         <div class="row g-3">
           <div class="col-12">
             <label class="form-label required">Nama Lokasi Yang Diminati</label>
-            <input 
-              type="text" 
+            <select 
               class="form-control custom-input" 
               v-model="formData.namaLokasi"
               required
             >
+              <option value="">Pilih Lokasi Tujuan</option>
+              <option v-for="kota in kotaList" :key="kota.id" :value="kota.nama_kota">
+                {{ kota.nama_kota }}, {{ kota.provinsi }}
+              </option>
+            </select>
           </div>
           <div class="col-12">
             <label class="form-label required">Pola Usaha Yang Diminati</label>
@@ -335,11 +415,18 @@ export default {
   data() {
     return {
       isSubmitting: false,
-      uploadedFiles: [],
+      uploadedFiles: {
+        ktp: null,
+        kk: null,
+        surat_nikah: null,
+        ijazah: null,
+        pas_foto: null
+      },
       showSuccessModal: false,
       user: null,
       errorMsg: '',
       fieldErrors: {},
+      kotaList: [],
       formData: {
         namaKepalaKeluarga: '',
         jenisKelamin: '',
@@ -378,24 +465,41 @@ export default {
     } catch {
       this.$router.push('/login');
     }
+    
+    // Load kota list
+    this.loadKotaList();
   },
   methods: {
+    async loadKotaList() {
+      try {
+        const res = await fetch('/api/kota', { credentials: 'include' });
+        if (res.ok) {
+          this.kotaList = await res.json();
+        }
+      } catch (e) {
+        console.error('Failed to load kota list:', e);
+      }
+    },
     goBack() {
       this.$router.go(-1);
     },
-    triggerFileUpload() {
-      this.$refs.fileInput.click();
+    triggerFileUpload(type) {
+      this.$refs[type + 'Input'].click();
     },
-    handleFileUpload(event) {
-      const files = Array.from(event.target.files);
-      this.uploadedFiles = [...this.uploadedFiles, ...files];
+    handleFileUpload(event, type) {
+      const file = event.target.files[0];
+      if (file) {
+        this.uploadedFiles[type] = file;
+      }
     },
-    handleFileDrop(event) {
-      const files = Array.from(event.dataTransfer.files);
-      this.uploadedFiles = [...this.uploadedFiles, ...files];
+    handleFileDrop(event, type) {
+      const file = event.dataTransfer.files[0];
+      if (file) {
+        this.uploadedFiles[type] = file;
+      }
     },
-    removeFile(index) {
-      this.uploadedFiles.splice(index, 1);
+    removeFile(type) {
+      this.uploadedFiles[type] = null;
     },
     async submitForm() {
       this.isSubmitting = true;
@@ -559,11 +663,15 @@ export default {
 .upload-area {
   border: 2px dashed #dc3545;
   border-radius: 12px;
-  padding: 40px;
+  padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: #fafafa;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-area:hover {
@@ -572,9 +680,9 @@ export default {
 }
 
 .upload-icon {
-  font-size: 48px;
+  font-size: 24px;
   color: #dc3545;
-  margin-bottom: 16px;
+  margin-right: 8px;
 }
 
 .upload-text {
@@ -583,21 +691,18 @@ export default {
   font-weight: 500;
 }
 
-.uploaded-files {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.document-upload-section {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #f8f9fa;
 }
 
-.uploaded-file {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #f8f9fa;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  border: 1px solid #dee2e6;
+.document-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .disclaimer-section {
