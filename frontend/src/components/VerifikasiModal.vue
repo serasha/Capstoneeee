@@ -14,9 +14,20 @@
         <div class="modal-row">
           <span class="modal-label">Status:</span>
           <select v-model="status" class="modal-select">
+            <option value="pending">Pending</option>
             <option value="verifikasi">Verifikasi</option>
+            <option value="dikembalikan">Dikembalikan</option>
             <option value="ditolak">Tolak</option>
           </select>
+        </div>
+        <div class="modal-row" v-if="status === 'dikembalikan' || status === 'ditolak'">
+          <span class="modal-label">Catatan:</span>
+          <textarea 
+            v-model="catatan" 
+            class="modal-textarea"
+            placeholder="Berikan catatan untuk pendaftar..."
+            rows="3"
+          ></textarea>
         </div>
       </div>
       <div class="modal-actions">
@@ -40,7 +51,8 @@ export default {
   data() {
     return {
       status: this.pendaftaran && this.pendaftaran.isVerified ? 'verifikasi' : 'pending',
-      loading: false
+      loading: false,
+      catatan: ''
     }
   },
   watch: {
@@ -55,7 +67,10 @@ export default {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ status_pendaftar: this.status })
+        body: JSON.stringify({ 
+          status_pendaftar: this.status,
+          catatan: this.catatan 
+        })
       })
       this.loading = false
       this.$emit('success')
@@ -126,6 +141,22 @@ export default {
   transition: border 0.2s;
 }
 .modal-select:focus {
+  border-color: #c82333;
+}
+.modal-textarea {
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  color: #dc3545;
+  background: #fff5f5;
+  margin-left: 0.5rem;
+  outline: none;
+  transition: border 0.2s;
+  width: 100%;
+  resize: vertical;
+}
+.modal-textarea:focus {
   border-color: #c82333;
 }
 .modal-actions {

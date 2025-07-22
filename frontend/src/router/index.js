@@ -69,6 +69,11 @@ const routes = [
         path: 'verifikasi',
         name: 'AdminVerifikasi',
         component: AdminVerifikasi
+      },
+      {
+        path: 'master-kota',
+        name: 'AdminMasterKota',
+        component: () => import('../pages/admin/AdminMasterKota.vue')
       }
     ]
   },

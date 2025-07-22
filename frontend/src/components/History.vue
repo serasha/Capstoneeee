@@ -66,6 +66,23 @@
                     >
                       {{ item.status }}
                     </span>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-3">
+                      <button 
+                        class="btn btn-outline-primary btn-sm me-2"
+                        @click="viewDetail(item)"
+                      >
+                        <i class="fas fa-eye me-1"></i>Detail
+                      </button>
+                      <button 
+                        class="btn btn-outline-secondary btn-sm"
+                        @click="editForm(item)"
+                        v-if="item.status === 'pending' || item.status === 'dikembalikan'"
+                      >
+                        <i class="fas fa-edit me-1"></i>Edit
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -82,6 +99,62 @@
       </button>
     </div>
 
+    <!-- Detail Modal -->
+    <div v-if="showDetailModal" class="modal-overlay" @click="closeDetailModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h5 class="modal-title">Detail Pendaftaran</h5>
+          <button class="btn-close" @click="closeDetailModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="selectedItem">
+            <div class="detail-section">
+              <h6>Informasi Pendaftar</h6>
+              <p><strong>Nama:</strong> {{ selectedItem.nama }}</p>
+              <p><strong>Kota Asal:</strong> {{ selectedItem.kotaAsal }}</p>
+              <p><strong>Tujuan:</strong> {{ selectedItem.tujuanTransmigrasi }}</p>
+              <p><strong>Status:</strong> 
+                <span :class="getStatusClass(selectedItem.status)" class="badge">
+                  {{ selectedItem.status }}
+                </span>
+              </p>
+            </div>
+            
+            <!-- Timeline -->
+            <div class="timeline-section mt-4">
+              <h6>Timeline Proses</h6>
+              <div class="timeline">
+                <div v-for="(timeline, index) in timelineData" :key="index" class="timeline-item">
+                  <div class="timeline-marker" :class="getTimelineMarkerClass(timeline.status)"></div>
+                  <div class="timeline-content">
+                    <h6>{{ timeline.tahap }}</h6>
+                    <p>{{ timeline.keterangan }}</p>
+                    <small class="text-muted">{{ formatDate(timeline.tanggal) }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Wawancara Info (jika ada) -->
+            <div v-if="wawancaraData" class="wawancara-section mt-4">
+              <h6>Informasi Wawancara</h6>
+              <div class="alert alert-info">
+                <p><strong>Tanggal:</strong> {{ formatDate(wawancaraData.tanggal_wawancara) }}</p>
+                <p><strong>Waktu:</strong> {{ wawancaraData.waktu_wawancara }}</p>
+                <p><strong>Lokasi:</strong> {{ wawancaraData.lokasi }}</p>
+                <p><strong>Status:</strong> {{ wawancaraData.status_wawancara }}</p>
+                <p v-if="wawancaraData.hasil_wawancara">
+                  <strong>Hasil:</strong> {{ wawancaraData.hasil_wawancara }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="closeDetailModal">Tutup</button>
+        </div>
+      </div>
+    </div>
     <!-- Empty State (jika tidak ada data) -->
     <div v-if="!loading && statusData.length === 0" class="empty-state text-center py-5">
       <div class="mb-4">
@@ -101,7 +174,11 @@ export default {
     return {
       statusData: [],
       loading: true,
-      errorMsg: ''
+      errorMsg: '',
+      showDetailModal: false,
+      selectedItem: null,
+      timelineData: [],
+      wawancaraData: null
     }
   },
   async created() {
@@ -162,6 +239,51 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
+    async viewDetail(item) {
+      this.selectedItem = item;
+      this.showDetailModal = true;
+      
+      // Load timeline data
+      try {
+        const timelineRes = await fetch(`/api/timeline/${item.nomorRegistrasi}`, { credentials: 'include' });
+        if (timelineRes.ok) {
+          this.timelineData = await timelineRes.json();
+        }
+      } catch (e) {
+        console.error('Failed to load timeline:', e);
+      }
+      
+      // Load wawancara data
+      try {
+        const wawancaraRes = await fetch(`/api/wawancara/${item.nomorRegistrasi}`, { credentials: 'include' });
+        if (wawancaraRes.ok) {
+          this.wawancaraData = await wawancaraRes.json();
+        }
+      } catch (e) {
+        // Wawancara data might not exist yet
+      }
+    },
+    closeDetailModal() {
+      this.showDetailModal = false;
+      this.selectedItem = null;
+      this.timelineData = [];
+      this.wawancaraData = null;
+    },
+    editForm(item) {
+      // Navigate to edit form
+      this.$router.push(`/edit-form/${item.nomorRegistrasi}`);
+    },
+    formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('id-ID');
+    },
+    getTimelineMarkerClass(status) {
+      switch(status) {
+        case 'completed': return 'timeline-marker-completed';
+        case 'in_progress': return 'timeline-marker-progress';
+        case 'rejected': return 'timeline-marker-rejected';
+        default: return 'timeline-marker-pending';
+      }
+    },
     getStatusClass(status) {
       switch((status||'').toLowerCase()) {
         case 'proses':
@@ -170,6 +292,8 @@ export default {
           return 'bg-success text-white';
         case 'ditolak':
           return 'bg-danger text-white';
+        case 'dikembalikan':
+          return 'bg-warning text-dark';
         case 'pending':
           return 'bg-secondary text-white';
         default:
@@ -414,6 +538,122 @@ export default {
   transform: translateY(-2px);
 }
 
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Timeline Styles */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e9ecef;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -2rem;
+  top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  z-index: 1;
+}
+
+.timeline-marker-completed {
+  background: #28a745;
+}
+
+.timeline-marker-progress {
+  background: #ffc107;
+}
+
+.timeline-marker-rejected {
+  background: #dc3545;
+}
+
+.timeline-marker-pending {
+  background: #6c757d;
+}
+
+.timeline-content h6 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.timeline-content p {
+  margin-bottom: 0.25rem;
+  color: #666;
+}
+
+.detail-section {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.wawancara-section .alert {
+  margin-bottom: 0;
+}
 /* Custom scrollbar */
 .status-pengajuan-container::-webkit-scrollbar {
   width: 6px;
