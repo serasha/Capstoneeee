@@ -43,6 +43,10 @@ func main() {
 		&models.SuperAdmin{},
 		&models.User{},
 		&models.LogAktifitas{},
+		&models.Timeline{},
+		&models.Wawancara{},
+		&models.Dokumen{},
+		&models.Kota{},
 	)
 	log.Println("Dropping old tables...")
 
