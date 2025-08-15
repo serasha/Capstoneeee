@@ -13,6 +13,8 @@ func PendaftaranRoutes(router fiber.Router, db *gorm.DB) {
 	router.Get("/pendaftaran/user", middleware.AuthRequired, handlers.GetPendaftaranByUser(db))
 	router.Get("/pendaftaran/list", handlers.GetPendaftaranList(db))
 	router.Post("/pendaftaran", middleware.AuthRequired, handlers.CreatePendaftaran(db))
+	router.Post("/pendaftaran/flexible", middleware.AuthRequired, handlers.CreatePendaftaranFlexible(db))
+	router.Post("/pendaftaran/test", handlers.CreatePendaftaranTest(db)) // Untuk testing tanpa auth
 	router.Put("/pendaftaran/:id", handlers.UpdatePendaftaran(db))
 	router.Patch("/pendaftaran/:id/verifikasi", handlers.VerifikasiPendaftaran(db))
 	router.Delete("/pendaftaran/:id", handlers.DeletePendaftaran(db))

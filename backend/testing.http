@@ -100,20 +100,159 @@ Content-Type: application/json
 DELETE http://localhost:8070/api/superadmin/1
 
 ### --- PENDAFTARAN ---
-### CREATE PENDAFTARAN
+### CREATE PENDAFTARAN (Original)
 POST http://localhost:8070/api/pendaftaran
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "nama_pendaftar": "Budi Santoso",
+  "nik": "1234567890123456",
+  "tanggal_lahir": "1990-01-01",
+  "jenis_kelamin": "laki-laki",
+  "nomor_kk": "1234567890123456",
+  "pendidikan_terakhir": "SMA",
+  "pekerjaan": "Wiraswasta",
+  "alamat_pendaftar": "Jl. Merdeka No. 1, Jakarta Selatan",
+  "nomor_telepon": "08123456789",
+  "kelurahan": "Kebayoran Baru",
+  "jumlah_anggota": 4,
+  "kode_pos": 12120,
+  "provinsi": "DKI Jakarta",
+  "status": "aktif",
+  "kemantren": "Kebayoran Baru",
+  "status_kawin": "menikah",
+  "kota": "Jakarta Selatan",
+  "nama_anggota_keluarga": "Siti Aminah",
+  "nama_lokasi": "Kantor Layanan Publik Kebayoran Baru",
+  "pola_usaha": "perorangan",
+  "jenis_layanan": "KTP",
+  "cara_pendaftar": "online",
+  "dokumen_administrasi_pendaftar": "KTP, KK, Surat Nikah"
+}
+
+### CREATE PENDAFTARAN (Flexible - Lebih Sederhana)
+POST http://localhost:8070/api/pendaftaran/flexible
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+{
+  "nama_pendaftar": "Budi Santoso",
+  "nik": "1234567890123456",
+  "tanggal_lahir": "1990-01-01",
+  "jenis_kelamin": "laki-laki",
+  "nomor_kk": "1234567890123456",
+  "pendidikan_terakhir": "SMA",
+  "pekerjaan": "Wiraswasta",
+  "alamat_pendaftar": "Jl. Merdeka No. 1, Jakarta Selatan",
+  "nomor_telepon": "08123456789",
+  "kelurahan": "Kebayoran Baru",
+  "jumlah_anggota": 4,
+  "kode_pos": 12120,
+  "provinsi": "DKI Jakarta",
+  "status": "aktif",
+  "kemantren": "Kebayoran Baru",
+  "status_kawin": "menikah",
+  "kota": "Jakarta Selatan",
+  "nama_anggota_keluarga": "Siti Aminah",
+  "nama_lokasi": "Kantor Layanan Publik Kebayoran Baru",
+  "pola_usaha": "perorangan",
+  "jenis_layanan": "KTP",
+  "cara_pendaftar": "online"
+}
+
+### CREATE PENDAFTARAN (Test - Tanpa Authentication)
+POST http://localhost:8070/api/pendaftaran/test
 Content-Type: application/json
 
 {
-  "NamaPendaftar": "Budi Santoso",
-  "AlamatPendaftar": "Jl. Merdeka No. 1",
-  "WaktuPendaftaran": "2024-06-19T10:00:00Z",
-  "TanggalPendaftar": "2024-06-19T00:00:00Z",
-  "StatusPendaftar": "pending",
-  "JenisLayanan": "KTP",
-  "CaraPendaftar": "online",
-  "DokumenAdministrasi": "",
-  "MasyarakatID": 1
+  "nama_pendaftar": "Budi Santoso",
+  "nik": "1234567890123456",
+  "tanggal_lahir": "1990-01-01",
+  "jenis_kelamin": "laki-laki",
+  "nomor_kk": "1234567890123456",
+  "pendidikan_terakhir": "SMA",
+  "pekerjaan": "Wiraswasta",
+  "alamat_pendaftar": "Jl. Merdeka No. 1, Jakarta Selatan",
+  "nomor_telepon": "08123456789",
+  "kelurahan": "Kebayoran Baru",
+  "jumlah_anggota": 4,
+  "kode_pos": 12120,
+  "provinsi": "DKI Jakarta",
+  "status": "aktif",
+  "kemantren": "Kebayoran Baru",
+  "status_kawin": "menikah",
+  "kota": "Jakarta Selatan",
+  "nama_anggota_keluarga": "Siti Aminah",
+  "nama_lokasi": "Kantor Layanan Publik Kebayoran Baru",
+  "pola_usaha": "perorangan",
+  "jenis_layanan": "KTP",
+  "cara_pendaftar": "online"
+}
+
+### CREATE PENDAFTARAN (Simple - Minimal Data)
+POST http://localhost:8070/api/pendaftaran/simple
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso"
+}
+
+### CREATE PENDAFTARAN (Simple - Beberapa Field)
+POST http://localhost:8070/api/pendaftaran/simple
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso",
+  "nik": "1234567890123456",
+  "jenis_layanan": "KTP",
+  "cara_pendaftar": "online"
+}
+
+### CREATE PENDAFTARAN (Minimal - Paling Sederhana)
+POST http://localhost:8070/api/pendaftaran/minimal
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso"
+}
+
+### CREATE PENDAFTARAN (Minimal - Dengan Number)
+POST http://localhost:8070/api/pendaftaran/minimal
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso",
+  "jumlah_anggota": 4,
+  "kode_pos": 12120
+}
+
+### CREATE PENDAFTARAN (Ultra - Dengan String Number)
+POST http://localhost:8070/api/pendaftaran/ultra
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso",
+  "jumlah_anggota": "4",
+  "kode_pos": "12120"
+}
+
+### CREATE PENDAFTARAN (Ultra - Dengan Number)
+POST http://localhost:8070/api/pendaftaran/ultra
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso",
+  "jumlah_anggota": 4,
+  "kode_pos": 12120
+}
+
+### CREATE PENDAFTARAN (Ultra - Minimal Data)
+POST http://localhost:8070/api/pendaftaran/ultra
+Content-Type: application/json
+
+{
+  "nama_pendaftar": "Budi Santoso"
 }
 
 ### GET ALL PENDAFTARAN

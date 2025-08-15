@@ -4,8 +4,20 @@
     <div class="header-section mb-4">
       <button class="btn btn-link p-0 mb-3 text-decoration-none" @click="goBack">
         <i class="fas fa-arrow-left me-2"></i>
-        <span class="fw-medium">Formulir Pengajuan</span>
+        <span class="fw-medium">
+          {{ isEditMode ? 'Edit Formulir Pengajuan' : 'Formulir Pengajuan' }}
+        </span>
       </button>
+      <!-- Alert untuk mode edit -->
+      <div v-if="isEditMode" class="alert alert-info">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-edit me-2"></i>
+          <div>
+            <strong>Mode Edit</strong><br>
+            <small>Anda sedang mengedit formulir yang telah dikembalikan. Silakan perbaiki data yang diperlukan.</small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <form @submit.prevent="submitForm" class="registration-form">
@@ -32,12 +44,15 @@
           </div>
           <div class="col-md-6">
             <label class="form-label required">Jenis Kelamin</label>
-            <input 
-              type="text" 
-              class="form-control custom-input" 
+            <select
+              class="form-select custom-input"
               v-model="formData.jenisKelamin"
               required
             >
+              <option disabled value="">Pilih jenis kelamin</option>
+              <option value="laki-laki">Laki-laki</option>
+              <option value="perempuan">Perempuan</option>
+            </select>
           </div>
           <div class="col-md-6">
             <label class="form-label required">Nomor Induk Kependudukan (NIK)</label>
@@ -175,12 +190,15 @@
           </div>
           <div class="col-md-4">
             <label class="form-label required">Status (Kawin/Belum Kawin)</label>
-            <input 
-              type="text" 
-              class="form-control custom-input" 
+            <select
+              class="form-select custom-input"
               v-model="formData.status"
               required
             >
+              <option disabled value="">Pilih status</option>
+              <option value="Kawin">Kawin</option>
+              <option value="Belum Kawin">Belum Kawin</option>
+            </select>
           </div>
           <div class="col-md-6">
             <label class="form-label required">Kemantren</label>
@@ -390,7 +408,7 @@
       <div class="text-center">
         <button type="submit" class="btn btn-submit" :disabled="isSubmitting">
           <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-          {{ isSubmitting ? 'Memproses...' : 'SUBMIT PENDAFTARAN' }}
+          {{ isSubmitting ? 'Memproses...' : (isEditMode ? 'PERBARUI DATA' : 'SUBMIT PENDAFTARAN') }}
         </button>
       </div>
     </form>
@@ -415,6 +433,8 @@ export default {
   data() {
     return {
       isSubmitting: false,
+      isEditMode: false,
+      editData: null,
       uploadedFiles: {
         ktp: null,
         kk: null,
@@ -468,6 +488,9 @@ export default {
     
     // Load kota list
     this.loadKotaList();
+    
+    // Cek jika ada data untuk edit
+    this.checkEditMode();
   },
   methods: {
     async loadKotaList() {
@@ -483,8 +506,91 @@ export default {
     goBack() {
       this.$router.go(-1);
     },
+    checkEditMode() {
+      // Cek apakah ada data edit di localStorage
+      const editDataStr = localStorage.getItem('editFormData');
+      if (editDataStr) {
+        try {
+          this.editData = JSON.parse(editDataStr);
+          if (this.editData.isEditing) {
+            this.isEditMode = true;
+            this.loadFormDataForEdit();
+            // Hapus data edit dari localStorage setelah dimuat
+            localStorage.removeItem('editFormData');
+          }
+        } catch (e) {
+          console.error('Error parsing edit data:', e);
+        }
+      }
+    },
+    async loadFormDataForEdit() {
+      if (!this.editData || !this.editData.nomorRegistrasi) return;
+      
+      try {
+        // Load data pendaftaran berdasarkan nomor registrasi
+        const res = await fetch(`/api/pendaftaran/${this.editData.nomorRegistrasi}`, { 
+          credentials: 'include' 
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          
+          // Isi form dengan data yang ada
+          this.formData = {
+            namaKepalaKeluarga: data.nama_pendaftar || this.editData.nama || '',
+            jenisKelamin: data.jenis_kelamin || '',
+            nik: data.nik || '',
+            pilihan: data.jenis_layanan || this.editData.tujuanTransmigrasi || '',
+            nomorKK: data.nomor_kk || '',
+            pendidikanTerakhir: data.pendidikan_terakhir || '',
+            tanggalLahir: data.tanggal_lahir || '',
+            pekerjaan: data.pekerjaan || '',
+            namaJalan: data.alamat_pendaftar || this.editData.kotaAsal || '',
+            nomorTelepon: data.nomor_telepon || '',
+            kelurahan: data.kelurahan || '',
+            jumlahAnggota: data.jumlah_anggota || '',
+            kodePos: data.kode_pos || '',
+            provinsi: data.provinsi || '',
+            status: data.status || '',
+            kemantren: data.kemantren || '',
+            statusKawin: data.status_kawin || '',
+            kota: data.kota || '',
+            namaAnggotaKeluarga: data.nama_anggota_keluarga || '',
+            namaLokasi: data.nama_lokasi || '',
+            polaUsaha: data.pola_usaha || '',
+            nomorPendaftaran: this.editData.nomorRegistrasi || ''
+          };
+          
+          // Set error message untuk mode edit
+          this.errorMsg = `Mode Edit: Anda sedang mengedit formulir dengan nomor registrasi ${this.editData.nomorRegistrasi}. Status saat ini: ${this.editData.status}`;
+          
+        } else {
+          // Jika tidak bisa load dari API, gunakan data dari History
+          this.formData.namaKepalaKeluarga = this.editData.nama || '';
+          this.formData.namaJalan = this.editData.kotaAsal || '';
+          this.formData.pilihan = this.editData.tujuanTransmigrasi || '';
+          this.formData.nomorPendaftaran = this.editData.nomorRegistrasi || '';
+          
+          this.errorMsg = `Mode Edit: Menggunakan data dasar. Silakan lengkapi data yang diperlukan untuk formulir ${this.editData.nomorRegistrasi}`;
+        }
+      } catch (e) {
+        console.error('Error loading form data for edit:', e);
+        // Fallback ke data dari History
+        this.formData.namaKepalaKeluarga = this.editData.nama || '';
+        this.formData.namaJalan = this.editData.kotaAsal || '';
+        this.formData.pilihan = this.editData.tujuanTransmigrasi || '';
+        this.formData.nomorPendaftaran = this.editData.nomorRegistrasi || '';
+        
+        this.errorMsg = `Mode Edit: Gagal memuat data lengkap. Silakan lengkapi formulir untuk ${this.editData.nomorRegistrasi}`;
+      }
+    },
     triggerFileUpload(type) {
-      this.$refs[type + 'Input'].click();
+      const refName = type + 'Input';
+      if (this.$refs[refName]) {
+        this.$refs[refName].click();
+      } else {
+        console.error('File input ref not found:', refName, this.$refs);
+      }
     },
     handleFileUpload(event, type) {
       const file = event.target.files[0];
@@ -506,19 +612,45 @@ export default {
       this.errorMsg = '';
       this.fieldErrors = {};
       try {
-        // Kirim data ke backend (hanya field yang perlu diisi user)
-        const response = await fetch('/api/pendaftaran', {
-          method: 'POST',
+        // Tentukan URL dan method berdasarkan mode
+        const url = this.isEditMode ? 
+          `/api/pendaftaran/${this.editData.nomorRegistrasi}` : 
+          '/api/pendaftaran';
+        const method = this.isEditMode ? 'PUT' : 'POST';
+        
+        // Kirim SEMUA data ke backend
+        const response = await fetch(url, {
+          method: method,
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
           body: JSON.stringify({
             nama_pendaftar: this.formData.namaKepalaKeluarga,
+            nik: this.formData.nik,
+            tanggal_lahir: this.formData.tanggalLahir,
+            jenis_kelamin: this.formData.jenisKelamin,
+            nomor_kk: this.formData.nomorKK,
+            pendidikan_terakhir: this.formData.pendidikanTerakhir,
+            pekerjaan: this.formData.pekerjaan,
             alamat_pendaftar: this.formData.namaJalan,
+            nomor_telepon: this.formData.nomorTelepon,
+            kelurahan: this.formData.kelurahan,
+            jumlah_anggota: this.formData.jumlahAnggota,
+            kode_pos: this.formData.kodePos,
+            provinsi: this.formData.provinsi,
+            status: this.formData.status,
+            kemantren: this.formData.kemantren,
+            status_kawin: this.formData.statusKawin,
+            kota: this.formData.kota,
+            nama_anggota_keluarga: this.formData.namaAnggotaKeluarga,
+            nama_lokasi: this.formData.namaLokasi,
+            pola_usaha: this.formData.polaUsaha,
+            nomor_pendaftaran: this.formData.nomorPendaftaran,
             jenis_layanan: this.formData.pilihan,
             cara_pendaftar: 'online',
             dokumen_administrasi_pendaftar: '', // handle upload terpisah jika perlu
+            status_pendaftar: this.isEditMode ? 'pending' : 'pending', // Reset status ke pending setelah edit
           }),
         });
         if (!response.ok) {
@@ -526,18 +658,21 @@ export default {
           try {
             errorData = await response.json();
           } catch (e) {
-            errorData = { error: 'Gagal mendaftar' };
+            errorData = { error: this.isEditMode ? 'Gagal mengupdate data' : 'Gagal mendaftar' };
           }
           if (errorData.errors) {
             this.fieldErrors = errorData.errors;
             this.errorMsg = '';
           } else {
-            this.errorMsg = errorData.error || 'Gagal mendaftar';
+            this.errorMsg = errorData.error || (this.isEditMode ? 'Gagal mengupdate data' : 'Gagal mendaftar');
           }
           throw new Error(this.errorMsg || 'Validasi error');
         }
         // Jika sukses
-        alert('Pendaftaran berhasil! Status: pending.');
+        const successMessage = this.isEditMode ? 
+          'Data berhasil diperbarui! Status telah direset ke pending untuk review ulang.' : 
+          'Pendaftaran berhasil! Status: pending.';
+        alert(successMessage);
         this.showSuccessModal = true;
       } catch (error) {
         // errorMsg dan fieldErrors sudah di-set

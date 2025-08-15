@@ -49,7 +49,7 @@
                   @click="downloadData"
                   :disabled="loading"
                 >
-                  <i class="fas fa-download me-2"></i>
+                  <ArrowDownTrayIcon style="width:20px;height:20px;" class="me-2" />
                   Download Data
                 </button>
               </div>
@@ -66,7 +66,7 @@
                       @input="handleSearch"
                     >
                     <button class="btn btn-search" @click="performSearch">
-                      <i class="fas fa-search"></i>
+                      <MagnifyingGlassIcon style="width:20px;height:20px;" />
                     </button>
                   </div>
                 </div>
@@ -145,7 +145,7 @@
                         @click="verifyData(item)"
                         :disabled="item.isVerified"
                       >
-                        <i class="fas fa-check me-1"></i>
+                        <CheckIcon style="width:20px;height:20px;" class="me-1" />
                         {{ item.isVerified ? 'Terverifikasi' : 'Verifikasi' }}
                       </button>
                     </td>
@@ -172,7 +172,7 @@
                         @click="previousPage"
                         :disabled="currentPage === 1"
                       >
-                        <i class="fas fa-angle-double-left"></i>
+                        <ChevronDoubleLeftIcon style="width:20px;height:20px;" />
                       </button>
                     </li>
                     <li class="page-item" :class="{ disabled: currentPage === 1 }">
@@ -181,7 +181,7 @@
                         @click="previousPage"
                         :disabled="currentPage === 1"
                       >
-                        <i class="fas fa-angle-left"></i>
+                        <ChevronLeftIcon style="width:20px;height:20px;" />
                       </button>
                     </li>
                     <li 
@@ -203,7 +203,7 @@
                         @click="nextPage"
                         :disabled="currentPage === totalPages"
                       >
-                        <i class="fas fa-angle-right"></i>
+                        <ChevronRightIcon style="width:20px;height:20px;" />
                       </button>
                     </li>
                     <li class="page-item" :class="{ disabled: currentPage === totalPages }">
@@ -212,7 +212,7 @@
                         @click="goToPage(totalPages)"
                         :disabled="currentPage === totalPages"
                       >
-                        <i class="fas fa-angle-double-right"></i>
+                        <ChevronDoubleRightIcon style="width:20px;height:20px;" />
                       </button>
                     </li>
                   </ul>
@@ -237,8 +237,10 @@
 </template>
 
 <script>
+import { ArrowDownTrayIcon, MagnifyingGlassIcon, CheckCircleIcon, ChevronDoubleLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleRightIcon, CheckIcon } from '@heroicons/vue/24/solid'
 export default {
   name: 'VerifikasiData',
+  components: { ArrowDownTrayIcon, MagnifyingGlassIcon, CheckCircleIcon, ChevronDoubleLeftIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleRightIcon, CheckIcon },
   data() {
     return {
       loading: false,

@@ -6,7 +6,6 @@ import (
 
 	"my-app/backend/models"
 	"time"
-	"github.com/go-playground/validator/v10"
 	"fmt"
 )
 
@@ -14,7 +13,7 @@ import (
 func GetAllPendaftaran(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var pendaftaran []models.Pendaftaran
-		if err := db.Preload("Masyarakat").Preload("Pengelolaan").Find(&pendaftaran).Error; err != nil {
+		if err := db.Preload("Masyarakat").Preload("Dikelola").Find(&pendaftaran).Error; err != nil {
 			return c.Status(500).JSON(fiber.Map{
 				"error": "Gagal mengambil data pendaftaran",
 			})
@@ -44,7 +43,8 @@ func CreatePendaftaran(db *gorm.DB) fiber.Handler {
 		var input models.Pendaftaran
 		if err := c.BodyParser(&input); err != nil {
 			return c.Status(400).JSON(fiber.Map{
-				"error": "Permintaan tidak valid",
+				"error": "Permintaan tidak valid: " + err.Error(),
+				"message": "Pastikan format JSON benar dan Content-Type adalah application/json",
 			})
 		}
 
@@ -54,26 +54,17 @@ func CreatePendaftaran(db *gorm.DB) fiber.Handler {
 			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
 		}
 
-		// Validasi struct dengan validator
-		validate := validator.New()
-		if err := validate.Struct(input); err != nil {
-			fieldErrors := make(map[string]string)
-			for _, err := range err.(validator.ValidationErrors) {
-				jsonField := err.Field()
-				switch err.Tag() {
-				case "required":
-					fieldErrors[jsonField] = jsonField + " wajib diisi"
-				case "min":
-					fieldErrors[jsonField] = jsonField + " minimal " + err.Param() + " karakter"
-				case "max":
-					fieldErrors[jsonField] = jsonField + " maksimal " + err.Param() + " karakter"
-				case "oneof":
-					fieldErrors[jsonField] = jsonField + " harus salah satu dari: " + err.Param()
-				default:
-					fieldErrors[jsonField] = "Format " + jsonField + " tidak valid"
-				}
-			}
-			return c.Status(400).JSON(fiber.Map{"errors": fieldErrors})
+		// Validasi minimal agar tidak gagal karena field opsional
+		missing := []string{}
+		if input.NamaPendaftar == "" { missing = append(missing, "nama_pendaftar") }
+		if input.NIK == "" { missing = append(missing, "nik") }
+		if input.JenisLayanan == "" { missing = append(missing, "jenis_layanan") }
+		if input.CaraPendaftar == "" { missing = append(missing, "cara_pendaftar") }
+		if len(missing) > 0 {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Validasi minimal gagal",
+				"missing_fields": missing,
+			})
 		}
 
 		// Set status dan waktu otomatis
@@ -82,16 +73,243 @@ func CreatePendaftaran(db *gorm.DB) fiber.Handler {
 		input.TanggalPendaftar = time.Now()
 		input.MasyarakatID = uint(userID)
 
+		// Generate nomor pendaftaran otomatis jika kosong
+		if input.NomorPendaftaran == "" {
+			input.NomorPendaftaran = generateNomorPendaftaran()
+		}
+
 		if err := db.Create(&input).Error; err != nil {
 			return c.Status(500).JSON(fiber.Map{
-				"error": "Gagal menyimpan data pendaftaran",
+				"error": "Gagal menyimpan data pendaftaran: " + err.Error(),
 			})
 		}
 
 		// Buat timeline awal
 		CreateTimeline(db, input.ID, "pendaftaran", "completed", "Pendaftaran berhasil dibuat")
-		return c.Status(201).JSON(input)
+		
+		return c.Status(201).JSON(fiber.Map{
+			"message": "Pendaftaran berhasil dibuat",
+			"data": input,
+		})
 	}
+}
+
+// CreatePendaftaranFlexible menyimpan data pendaftaran dengan validasi yang lebih fleksibel
+func CreatePendaftaranFlexible(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var input struct {
+			NamaPendaftar         string `json:"nama_pendaftar" validate:"required,min=3,max=100"`
+			NIK                   string `json:"nik" validate:"required,min=8,max=32"`
+			TanggalLahir          string `json:"tanggal_lahir" validate:"required"`
+			JenisKelamin          string `json:"jenis_kelamin" validate:"required"`
+			NomorKK               string `json:"nomor_kk" validate:"required"`
+			PendidikanTerakhir    string `json:"pendidikan_terakhir" validate:"required"`
+			Pekerjaan             string `json:"pekerjaan" validate:"required"`
+			AlamatPendaftar       string `json:"alamat_pendaftar" validate:"required,min=5,max=200"`
+			NomorTelepon          string `json:"nomor_telepon" validate:"required"`
+			Kelurahan             string `json:"kelurahan" validate:"required"`
+			JumlahAnggota         models.FlexibleInt `json:"jumlah_anggota" validate:"required"`
+			KodePos               models.FlexibleInt `json:"kode_pos" validate:"required"`
+			Provinsi              string `json:"provinsi" validate:"required"`
+			Status                string `json:"status" validate:"required"`
+			Kemantren             string `json:"kemantren" validate:"required"`
+			StatusKawin           string `json:"status_kawin" validate:"required"`
+			Kota                  string `json:"kota" validate:"required"`
+			NamaAnggotaKeluarga   string `json:"nama_anggota_keluarga" validate:"required"`
+			NamaLokasi            string `json:"nama_lokasi" validate:"required"`
+			PolaUsaha             string `json:"pola_usaha" validate:"required"`
+			JenisLayanan          string `json:"jenis_layanan" validate:"required,min=3,max=50"`
+			CaraPendaftar         string `json:"cara_pendaftar" validate:"required"`
+			DokumenAdministrasi   string `json:"dokumen_administrasi_pendaftar"`
+		}
+
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Permintaan tidak valid: " + err.Error(),
+				"message": "Pastikan format JSON benar dan Content-Type adalah application/json",
+			})
+		}
+
+		// Ambil user login dari JWT
+		userID, ok := c.Locals("user_id").(float64)
+		if !ok || userID == 0 {
+			return c.Status(401).JSON(fiber.Map{"error": "Unauthorized"})
+		}
+
+		// Validasi dengan custom validation
+		if input.JenisKelamin != "laki-laki" && input.JenisKelamin != "perempuan" {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Validasi gagal",
+				"errors": map[string]string{
+					"jenis_kelamin": "jenis_kelamin harus 'laki-laki' atau 'perempuan'",
+				},
+			})
+		}
+
+		if input.CaraPendaftar != "online" && input.CaraPendaftar != "offline" {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Validasi gagal",
+				"errors": map[string]string{
+					"cara_pendaftar": "cara_pendaftar harus 'online' atau 'offline'",
+				},
+			})
+		}
+
+		// Buat objek Pendaftaran
+		pendaftaran := models.Pendaftaran{
+			NamaPendaftar:         input.NamaPendaftar,
+			NIK:                   input.NIK,
+			TanggalLahir:          input.TanggalLahir,
+			JenisKelamin:          input.JenisKelamin,
+			NomorKK:               input.NomorKK,
+			PendidikanTerakhir:    input.PendidikanTerakhir,
+			Pekerjaan:             input.Pekerjaan,
+			AlamatPendaftar:       input.AlamatPendaftar,
+			NomorTelepon:          input.NomorTelepon,
+			Kelurahan:             input.Kelurahan,
+			JumlahAnggota:         input.JumlahAnggota,
+			KodePos:               input.KodePos,
+			Provinsi:              input.Provinsi,
+			Status:                input.Status,
+			Kemantren:             input.Kemantren,
+			StatusKawin:           input.StatusKawin,
+			Kota:                  input.Kota,
+			NamaAnggotaKeluarga:   input.NamaAnggotaKeluarga,
+			NamaLokasi:            input.NamaLokasi,
+			PolaUsaha:             input.PolaUsaha,
+			NomorPendaftaran:      generateNomorPendaftaran(),
+			JenisLayanan:          input.JenisLayanan,
+			CaraPendaftar:         input.CaraPendaftar,
+			DokumenAdministrasi:   input.DokumenAdministrasi,
+			StatusPendaftar:       "pending",
+			WaktuPendaftaran:      time.Now(),
+			TanggalPendaftar:      time.Now(),
+			MasyarakatID:          uint(userID),
+		}
+
+		if err := db.Create(&pendaftaran).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Gagal menyimpan data pendaftaran: " + err.Error(),
+			})
+		}
+
+		// Buat timeline awal
+		CreateTimeline(db, pendaftaran.ID, "pendaftaran", "completed", "Pendaftaran berhasil dibuat")
+		
+		return c.Status(201).JSON(fiber.Map{
+			"message": "Pendaftaran berhasil dibuat",
+			"data": pendaftaran,
+		})
+	}
+}
+
+// CreatePendaftaranTest untuk testing tanpa authentication
+func CreatePendaftaranTest(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var input struct {
+			NamaPendaftar         string `json:"nama_pendaftar" validate:"required,min=3,max=100"`
+			NIK                   string `json:"nik" validate:"required,min=8,max=32"`
+			TanggalLahir          string `json:"tanggal_lahir" validate:"required"`
+			JenisKelamin          string `json:"jenis_kelamin" validate:"required"`
+			NomorKK               string `json:"nomor_kk" validate:"required"`
+			PendidikanTerakhir    string `json:"pendidikan_terakhir" validate:"required"`
+			Pekerjaan             string `json:"pekerjaan" validate:"required"`
+			AlamatPendaftar       string `json:"alamat_pendaftar" validate:"required,min=5,max=200"`
+			NomorTelepon          string `json:"nomor_telepon" validate:"required"`
+			Kelurahan             string `json:"kelurahan" validate:"required"`
+			JumlahAnggota         models.FlexibleInt `json:"jumlah_anggota" validate:"required"`
+			KodePos               models.FlexibleInt `json:"kode_pos" validate:"required"`
+			Provinsi              string `json:"provinsi" validate:"required"`
+			Status                string `json:"status" validate:"required"`
+			Kemantren             string `json:"kemantren" validate:"required"`
+			StatusKawin           string `json:"status_kawin" validate:"required"`
+			Kota                  string `json:"kota" validate:"required"`
+			NamaAnggotaKeluarga   string `json:"nama_anggota_keluarga" validate:"required"`
+			NamaLokasi            string `json:"nama_lokasi" validate:"required"`
+			PolaUsaha             string `json:"pola_usaha" validate:"required"`
+			JenisLayanan          string `json:"jenis_layanan" validate:"required,min=3,max=50"`
+			CaraPendaftar         string `json:"cara_pendaftar" validate:"required"`
+			DokumenAdministrasi   string `json:"dokumen_administrasi_pendaftar"`
+		}
+
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Permintaan tidak valid: " + err.Error(),
+				"message": "Pastikan format JSON benar dan Content-Type adalah application/json",
+			})
+		}
+
+		// Validasi dengan custom validation
+		if input.JenisKelamin != "laki-laki" && input.JenisKelamin != "perempuan" {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Validasi gagal",
+				"errors": map[string]string{
+					"jenis_kelamin": "jenis_kelamin harus 'laki-laki' atau 'perempuan'",
+				},
+			})
+		}
+
+		if input.CaraPendaftar != "online" && input.CaraPendaftar != "offline" {
+			return c.Status(400).JSON(fiber.Map{
+				"error": "Validasi gagal",
+				"errors": map[string]string{
+					"cara_pendaftar": "cara_pendaftar harus 'online' atau 'offline'",
+				},
+			})
+		}
+
+		// Buat objek Pendaftaran
+		pendaftaran := models.Pendaftaran{
+			NamaPendaftar:         input.NamaPendaftar,
+			NIK:                   input.NIK,
+			TanggalLahir:          input.TanggalLahir,
+			JenisKelamin:          input.JenisKelamin,
+			NomorKK:               input.NomorKK,
+			PendidikanTerakhir:    input.PendidikanTerakhir,
+			Pekerjaan:             input.Pekerjaan,
+			AlamatPendaftar:       input.AlamatPendaftar,
+			NomorTelepon:          input.NomorTelepon,
+			Kelurahan:             input.Kelurahan,
+			JumlahAnggota:         input.JumlahAnggota,
+			KodePos:               input.KodePos,
+			Provinsi:              input.Provinsi,
+			Status:                input.Status,
+			Kemantren:             input.Kemantren,
+			StatusKawin:           input.StatusKawin,
+			Kota:                  input.Kota,
+			NamaAnggotaKeluarga:   input.NamaAnggotaKeluarga,
+			NamaLokasi:            input.NamaLokasi,
+			PolaUsaha:             input.PolaUsaha,
+			NomorPendaftaran:      generateNomorPendaftaran(),
+			JenisLayanan:          input.JenisLayanan,
+			CaraPendaftar:         input.CaraPendaftar,
+			DokumenAdministrasi:   input.DokumenAdministrasi,
+			StatusPendaftar:       "pending",
+			WaktuPendaftaran:      time.Now(),
+			TanggalPendaftar:      time.Now(),
+			MasyarakatID:          1, // Default untuk testing
+		}
+
+		if err := db.Create(&pendaftaran).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"error": "Gagal menyimpan data pendaftaran: " + err.Error(),
+			})
+		}
+
+		// Buat timeline awal
+		CreateTimeline(db, pendaftaran.ID, "pendaftaran", "completed", "Pendaftaran berhasil dibuat")
+		
+		return c.Status(201).JSON(fiber.Map{
+			"message": "Pendaftaran berhasil dibuat",
+			"data": pendaftaran,
+		})
+	}
+}
+
+// generateNomorPendaftaran menghasilkan nomor pendaftaran otomatis
+func generateNomorPendaftaran() string {
+	timestamp := time.Now().Format("20060102150405")
+	return "REG-" + timestamp
 }
 
 // UpdatePendaftaran memperbarui data pendaftaran berdasarkan ID
@@ -187,6 +405,7 @@ func VerifikasiPendaftaran(db *gorm.DB) fiber.Handler {
 		id := c.Params("id")
 		var input struct {
 			StatusPendaftar string `json:"status_pendaftar"`
+			Catatan         string `json:"catatan"`
 		}
 		if err := c.BodyParser(&input); err != nil {
 			return c.Status(400).JSON(fiber.Map{"error": "Input tidak valid"})
@@ -210,24 +429,43 @@ func VerifikasiPendaftaran(db *gorm.DB) fiber.Handler {
 				action = "Kembalikan"
 			}
 			deskripsi := "Pendaftaran ID: " + id
+			if input.Catatan != "" {
+				deskripsi += " | Catatan: " + input.Catatan
+			}
 			_ = CreateLogAktifitas(db, adminID, action, "Pendaftaran", deskripsi)
 		}
 
-		// Update timeline
+		// Update timeline dengan catatan admin bila ada
 		var timelineStatus, keterangan string
 		switch input.StatusPendaftar {
 		case "verifikasi":
 			timelineStatus = "completed"
-			keterangan = "Dokumen telah diverifikasi dan disetujui"
+			if input.Catatan != "" {
+				keterangan = input.Catatan
+			} else {
+				keterangan = "Dokumen telah diverifikasi dan disetujui"
+			}
 		case "ditolak":
 			timelineStatus = "rejected"
-			keterangan = "Pendaftaran ditolak"
+			if input.Catatan != "" {
+				keterangan = input.Catatan
+			} else {
+				keterangan = "Pendaftaran ditolak"
+			}
 		case "dikembalikan":
 			timelineStatus = "pending"
-			keterangan = "Dokumen dikembalikan untuk diperbaiki"
+			if input.Catatan != "" {
+				keterangan = input.Catatan
+			} else {
+				keterangan = "Dokumen dikembalikan untuk diperbaiki"
+			}
 		default:
 			timelineStatus = "pending"
-			keterangan = "Status diupdate"
+			if input.Catatan != "" {
+				keterangan = input.Catatan
+			} else {
+				keterangan = "Status diupdate"
+			}
 		}
 		
 		CreateTimeline(db, uint(parseUintFromString(id)), "verifikasi_dokumen", timelineStatus, keterangan)

@@ -17,7 +17,7 @@
         class="btn btn-outline-danger btn-sm"
         @click="downloadData"
       >
-        <i class="fas fa-download me-2"></i>
+        <ArrowDownTrayIcon style="width:20px;height:20px;" class="me-2" />
         Download Data
       </button>
     </div>
@@ -166,8 +166,10 @@
 </template>
 
 <script>
+import { ArrowDownTrayIcon } from '@heroicons/vue/24/solid'
 export default {
   name: 'LogAktivitas',
+  components: { ArrowDownTrayIcon },
   data() {
     return {
       userInfo: {

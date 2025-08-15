@@ -3,7 +3,7 @@
     <div class="page-header">
       <h1 class="page-title">Master Kota Tujuan</h1>
       <button class="btn btn-primary" @click="showAddModal = true">
-        <i class="fas fa-plus me-2"></i>Tambah Kota
+        <PlusIcon style="width:20px;height:20px;" class="me-2" />Tambah Kota
       </button>
     </div>
 
@@ -61,13 +61,13 @@
                   class="btn btn-sm btn-outline-primary me-2"
                   @click="editKota(kota)"
                 >
-                  <i class="fas fa-edit"></i>
+                  <PencilSquareIcon style="width:20px;height:20px;" />
                 </button>
                 <button 
                   class="btn btn-sm btn-outline-danger"
                   @click="deleteKota(kota.id)"
                 >
-                  <i class="fas fa-trash"></i>
+                  <TrashIcon style="width:20px;height:20px;" />
                 </button>
               </td>
             </tr>
@@ -155,8 +155,10 @@
 </template>
 
 <script>
+import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/solid'
 export default {
   name: 'AdminMasterKota',
+  components: { PlusIcon, PencilSquareIcon, TrashIcon },
   data() {
     return {
       searchQuery: '',

@@ -8,14 +8,14 @@
           class="btn btn-success btn-sm"
           @click="showAddModal = true"
         >
-          <i class="fas fa-plus me-2"></i>Tambah User
+          <PlusIcon style="width:20px;height:20px;" class="me-2" />Tambah User
         </button>
         <button 
           class="btn btn-outline-primary btn-sm"
           @click="refreshData"
           :disabled="loading"
         >
-          <i class="fas fa-sync-alt me-2" :class="{ 'fa-spin': loading }"></i>Refresh
+          <ArrowPathIcon style="width:20px;height:20px;" class="me-2" :class="{ 'fa-spin': loading }"></ArrowPathIcon>Refresh
         </button>
       </div>
     </div>
@@ -121,28 +121,28 @@
                     :disabled="loading"
                     title="Toggle Status"
                   >
-                    <i class="fas fa-toggle-on" v-if="item.status_aktif"></i>
-                    <i class="fas fa-toggle-off" v-else></i>
+                    <CheckCircleIcon style="width:20px;height:20px;" v-if="item.status_aktif"></CheckCircleIcon>
+                    <XCircleIcon style="width:20px;height:20px;" v-else></XCircleIcon>
                   </button>
                 </div>
               </td>
               <td>
                 <div class="btn-group btn-group-sm">
                   <button 
-                    class="btn btn-outline-primary"
+                    class="btn btn-sm btn-outline-primary me-2"
                     @click="editItem(item)"
                     title="Edit"
                     :disabled="loading"
                   >
-                    <i class="fas fa-edit"></i>
+                    <PencilSquareIcon style="width:20px;height:20px;" />
                   </button>
                   <button 
-                    class="btn btn-outline-danger"
+                    class="btn btn-sm btn-outline-danger"
                     @click="deleteItem(item)"
                     title="Hapus"
                     :disabled="loading"
                   >
-                    <i class="fas fa-trash"></i>
+                    <TrashIcon style="width:20px;height:20px;" />
                   </button>
                 </div>
               </td>
@@ -153,7 +153,7 @@
 
       <!-- Empty State -->
       <div v-if="!loading && filteredData.length === 0" class="empty-state text-center py-5">
-        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+        <UserGroupIcon style="width:40px;height:40px;" class="mb-3 text-muted" />
         <h5 class="text-muted">Tidak ada data ditemukan</h5>
         <p class="text-muted">Coba ubah filter pencarian atau tambah user baru</p>
       </div>
@@ -392,7 +392,8 @@
       :class="message.type === 'success' ? 'alert-success' : 'alert-danger'"
       style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;"
     >
-      <i :class="message.type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'" class="me-2"></i>
+      <CheckCircleIcon style="width:20px;height:20px;" class="me-2" v-if="message.type === 'success'" />
+      <ExclamationCircleIcon style="width:20px;height:20px;" class="me-2" v-else />
       {{ message.text }}
       <button 
         type="button" 
@@ -404,8 +405,10 @@
 </template>
 
 <script>
+import { PlusIcon, ArrowPathIcon, PencilSquareIcon, TrashIcon, CheckCircleIcon, XCircleIcon, UserGroupIcon, ExclamationCircleIcon } from '@heroicons/vue/24/solid'
 export default {
   name: 'HakAkses',
+  components: { PlusIcon, ArrowPathIcon, PencilSquareIcon, TrashIcon, CheckCircleIcon, XCircleIcon, UserGroupIcon, ExclamationCircleIcon },
   data() {
     return {
       loading: false,

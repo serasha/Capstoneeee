@@ -14,7 +14,7 @@
             class="nav-link"
             :class="{ active: isActiveRoute('/admin/dashboard') }"
           >
-            <i class="fas fa-home nav-icon"></i>
+            <HomeIcon class="nav-icon" style="width:20px;height:20px;" />
             <span class="nav-text">Beranda</span>
           </router-link>
         </li>
@@ -25,7 +25,7 @@
             class="nav-link"
             :class="{ active: isActiveRoute('/admin/verifikasi') }"
           >
-            <i class="fas fa-check-square nav-icon"></i>
+            <CheckBadgeIcon class="nav-icon" style="width:20px;height:20px;" />
             <span class="nav-text">Verifikasi</span>
           </router-link>
         </li>
@@ -36,7 +36,7 @@
             class="nav-link"
             :class="{ active: isActiveRoute('/admin/log-aktivitas') }"
           >
-            <i class="fas fa-list-alt nav-icon"></i>
+            <ClipboardDocumentListIcon class="nav-icon" style="width:20px;height:20px;" />
             <span class="nav-text">Log Aktivitas</span>
           </router-link>
         </li>
@@ -47,7 +47,7 @@
             class="nav-link"
             :class="{ active: isActiveRoute('/admin/hak-akses') }"
           >
-            <i class="fas fa-users nav-icon"></i>
+            <UsersIcon class="nav-icon" style="width:20px;height:20px;" />
             <span class="nav-text">Hak Akses</span>
           </router-link>
         </li>
@@ -58,7 +58,7 @@
             class="nav-link"
             :class="{ active: isActiveRoute('/admin/master-kota') }"
           >
-            <i class="fas fa-map-marker-alt nav-icon"></i>
+            <MapPinIcon class="nav-icon" style="width:20px;height:20px;" />
             <span class="nav-text">Master Kota</span>
           </router-link>
         </li>
@@ -68,7 +68,7 @@
     <!-- Logout Section -->
     <div class="sidebar-footer">
       <button class="logout-btn" @click="handleLogout">
-        <i class="fas fa-sign-out-alt nav-icon"></i>
+        <ArrowLeftOnRectangleIcon class="nav-icon" style="width:20px;height:20px;" />
         <span class="nav-text">Logout</span>
       </button>
     </div>
@@ -76,10 +76,12 @@
 </template>
 
 <script>
+import { HomeIcon, CheckBadgeIcon, ClipboardDocumentListIcon, UsersIcon, MapPinIcon, ArrowLeftOnRectangleIcon } from '@heroicons/vue/24/solid'
 import { useUserStore } from '@/store/userStore'
 
 export default {
   name: 'AdminSidebar',
+  components: { HomeIcon, CheckBadgeIcon, ClipboardDocumentListIcon, UsersIcon, MapPinIcon, ArrowLeftOnRectangleIcon },
   methods: {
     isActiveRoute(path) {
       return this.$route.path === path;
@@ -165,7 +167,7 @@ export default {
 .nav-icon {
   width: 20px;
   margin-right: 0.75rem;
-  font-size: 1.1rem;
+  /* font-size: 1.1rem; */
 }
 
 .nav-text {

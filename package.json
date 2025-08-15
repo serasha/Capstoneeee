@@ -8,11 +8,14 @@
     "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && go run main.go\""
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@heroicons/vue": "^2.2.0",
     "axios": "^1.10.0",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",
     "lottie-vuejs": "^0.4.0",
     "lottie-web": "^5.13.0",
+    "lucide-vue-next": "^0.525.0",
     "pinia": "^3.0.3",
     "vite": "^6.3.5",
     "vue-router": "^4.5.1"
